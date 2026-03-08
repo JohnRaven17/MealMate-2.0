@@ -341,7 +341,6 @@ body { font-family:'Nunito','Arial Rounded MT Bold',sans-serif; }
 
 /* ── MOBILE NAV ── */
 @media(max-width:768px){
-  /* Nav: stack logo top-center, links hidden until scroll */
   #mainNav {
     height: 64px;
     padding: 0 10px;
@@ -366,50 +365,49 @@ body { font-family:'Nunito','Arial Rounded MT Bold',sans-serif; }
   }
   .nav-logo img { height: 38px; max-width: 110px; }
 
-  /* Left links: shrink significantly */
+  /* Left links: ALWAYS visible on mobile (override default opacity:0) */
   .nav-left { display: flex; align-items: center; gap: 2px; z-index: 1003; }
   .nav-left a {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: none !important;
     margin-right: 0;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     padding: 4px 6px;
     white-space: nowrap;
-  }
-  /* scrolled links show */
-  #mainNav.scrolled .nav-left a {
-    font-size: 0.68rem;
-    padding: 3px 7px;
-    margin-right: 2px;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
   }
 
   /* Right side: compress */
   .nav-right { gap: 6px; }
-  .dark-toggle-btn { font-size: 0; padding: 6px 8px; min-width: 32px; justify-content: center; }
+  .dark-toggle-btn { padding: 5px 8px; }
   .dark-toggle-btn span.btn-label { display: none; }
-  /* Show only emoji icon for dark/effects btns */
-  .dark-toggle-btn::first-line { font-size: 1rem; }
 
   /* User profile: avatar only */
   .user-info { display: none; }
   .user-avatar { width: 30px; height: 30px; font-size: 0.75rem; }
   .user-profile { padding: 4px 6px; gap: 4px; }
 
-  /* Scrolled nav */
   #mainNav.scrolled { height: 50px; }
+  #mainNav.scrolled .nav-left a { font-size: 0.68rem; padding: 3px 6px; }
   .profile-dropdown { right: 6px; top: 56px; min-width: 160px; }
+
+  /* BMI section: remove excess padding */
+  .bmi-section-wrapper { padding: 20px 12px 40px; }
+  .bmi-section-intro { margin-bottom: 20px; }
 }
 
 @media(max-width:480px){
   #mainNav { height: 58px; padding: 0 8px; }
-  .nav-logo img { height: 32px; max-width: 90px; }
+  .nav-logo img { height: 30px; max-width: 88px; }
   .nav-logo { padding: 2px 8px; border-width: 2px; }
 
-  /* On very small screens: hide left nav links entirely, show only on scroll */
-  .nav-left a { display: none; }
-  #mainNav.scrolled .nav-left a {
-    display: inline-flex;
-    font-size: 0.62rem;
-    padding: 3px 5px;
-    margin-right: 1px;
+  /* Keep links visible but even smaller */
+  .nav-left a {
+    font-size: 0.6rem !important;
+    padding: 3px 5px !important;
   }
 
   .dark-toggle-btn { padding: 5px 7px; }
@@ -417,8 +415,9 @@ body { font-family:'Nunito','Arial Rounded MT Bold',sans-serif; }
 
   .hero-content-wrap { padding: 80px 16px 40px; }
 
-  /* BMI section mobile */
-  .bmi-section-inner .container { padding: 12px; gap: 16px; }
+  .bmi-section-wrapper { padding: 16px 8px 30px; }
+  .bmi-section-intro { margin-bottom: 14px; }
+  .bmi-section-inner .container { padding: 0; gap: 12px; }
   .tips-row { flex-direction: column; }
   .tip-card { min-width: unset; width: 100%; }
 
@@ -428,24 +427,23 @@ body { font-family:'Nunito','Arial Rounded MT Bold',sans-serif; }
 
 /* ── BMI PANEL MOBILE FIX ── */
 @media(max-width:900px){
+  .bmi-section-wrapper { padding: 24px 16px 50px; }
   .bmi-section-inner .container {
     grid-template-columns: 1fr;
-    padding: 16px;
-    gap: 20px;
+    padding: 0;
+    gap: 16px;
   }
   .panel {
     position: static !important;
     width: 100%;
     max-width: 100%;
   }
-  /* Inputs full width */
   .panel input,
   .panel select,
   .panel button#calculateBtn {
     width: 100%;
     font-size: 1rem;
   }
-  /* Gender buttons: side by side, full width */
   .gender-group {
     display: flex;
     gap: 10px;
@@ -456,20 +454,13 @@ body { font-family:'Nunito','Arial Rounded MT Bold',sans-serif; }
     padding: 14px 8px;
     font-size: 0.95rem;
   }
-  /* Content/results panel */
-  .content {
-    width: 100%;
-  }
-  /* Tips row: single column */
+  .content { width: 100%; }
   .tips-row {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
-  .tip-card {
-    min-width: unset;
-    width: 100%;
-  }
+  .tip-card { min-width: unset; width: 100%; }
   /* Meal table: scrollable */
   .meal-table-wrap, .meal-table {
     overflow-x: auto;
@@ -477,9 +468,7 @@ body { font-family:'Nunito','Arial Rounded MT Bold',sans-serif; }
     display: block;
     width: 100%;
   }
-  .meal-table table {
-    min-width: 420px;
-  }
+  .meal-table table { min-width: 420px; }
 }
 
 
