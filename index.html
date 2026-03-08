@@ -16,6 +16,8 @@
 #auth-section { display: block; }
 #app-section  { display: none; }
 
+html, body { overflow-x: hidden; max-width: 100%; }
+
 /* When showing auth: body gets gold bg, flex column layout */
 body.auth-mode {
   font-family: 'Arial Black', Arial, sans-serif;
@@ -353,6 +355,7 @@ body.auth-mode {
         .bmi-section-wrapper {
             background: repeating-linear-gradient(90deg, #fdeaea, #fdeaea 40px, #ffffff 40px, #ffffff 80px);
             padding: 70px 40px 80px;
+            overflow-x: hidden;
         }
         .bmi-section-inner { max-width: 1400px; margin: 0 auto; }
         .bmi-section-intro { text-align: center; margin-bottom: 46px; }
@@ -463,6 +466,36 @@ body.auth-mode {
             .tips-row { grid-template-columns: 1fr; }
         }
         @media(max-width:560px) { .gallery-grid { grid-template-columns: repeat(2,1fr); } }
+        @media(max-width:768px) {
+            .bmi-section-wrapper { padding: 20px 12px 40px !important; }
+            .bmi-section-inner .container { padding: 0 !important; gap: 16px !important; }
+            .bmi-section-intro { margin-bottom: 18px !important; }
+            .content { padding: 0 !important; }
+            .inline-welcome-box { padding: 24px 18px !important; margin-bottom: 14px !important; }
+            .bmi-display { padding: 24px 18px !important; margin-bottom: 14px !important; }
+            .metrics-grid { gap: 12px !important; margin-bottom: 14px !important; }
+            .metric-card { padding: 16px !important; }
+            .metric-card value { font-size: 24px !important; }
+            .macros-section { padding: 18px 14px !important; margin-bottom: 14px !important; }
+            .macros-section h2 { font-size: 20px !important; margin-bottom: 12px !important; }
+            .macro-card { padding: 16px !important; }
+            .macro-value { font-size: 30px !important; }
+            .recommendations-box { padding: 18px 14px !important; margin-bottom: 14px !important; }
+            .health-alert { padding: 18px 14px !important; margin-bottom: 14px !important; }
+            .meals-section { margin-top: 18px !important; }
+            .meals-section h2 { font-size: 20px !important; margin-bottom: 12px !important; }
+            .weekly-planner-section { padding: 18px 14px !important; margin-top: 18px !important; }
+            .weekly-planner-section h2 { font-size: 20px !important; margin-bottom: 12px !important; }
+            .email-section { margin-top: 14px !important; padding: 16px !important; }
+            .budget-info { padding: 14px !important; margin-bottom: 12px !important; font-size: 15px !important; }
+            .info-box { padding: 22px 16px !important; margin-bottom: 14px !important; font-size: 16px !important; }
+            .panel { padding: 20px !important; position: static !important; }
+            .panel h1 { font-size: 22px !important; margin-bottom: 18px !important; }
+            input, select { padding: 16px !important; font-size: 16px !important; margin-bottom: 16px !important; }
+            .gender-btn { padding: 16px !important; font-size: 16px !important; }
+            button#calculateBtn { padding: 16px !important; font-size: 17px !important; }
+            .gender-group { gap: 10px !important; margin-bottom: 16px !important; }
+        }
 
         /* ===== NAV LOGO — centered with animation ===== */
         .nav-logo {
@@ -653,7 +686,7 @@ body.auth-mode {
 </div>
 
 <!-- ===== BMI CALCULATOR (2nd section, right after hero) ===== -->
-<section class="bmi-section-wrapper" id="bmi-section" style="padding-top:20px;">
+<section class="bmi-section-wrapper" id="bmi-section">
     <div class="bmi-section-inner">
         <div class="bmi-section-intro sec-head reveal">
             <p class="sec-eyebrow">Try It Now</p>
