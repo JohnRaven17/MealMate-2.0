@@ -987,13 +987,19 @@ html {
         gap: 15px;
     }
     .weekly-table {
-        font-size: 12px;
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        font-size: 11px;
+        display: table;
+        width: 100%;
+        overflow-x: unset;
     }
     .weekly-table th, .weekly-table td {
-        padding: 10px;
+        padding: 6px 4px;
+        font-size: 11px;
+        word-break: break-word;
+        hyphens: auto;
+    }
+    .weekly-table th {
+        font-size: 11px;
     }
     .email-section input {
         width: 100%;
@@ -1078,9 +1084,15 @@ html {
     }
     .weekly-table {
         font-size: 10px;
+        display: table;
+        width: 100%;
+        overflow-x: unset;
     }
     .weekly-table th, .weekly-table td {
-        padding: 8px;
+        padding: 5px 3px;
+        font-size: 10px;
+        word-break: break-word;
+        hyphens: auto;
     }
     .email-section {
         padding: 15px;
