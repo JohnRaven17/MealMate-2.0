@@ -1009,6 +1009,28 @@ html {
     .bmi-section-wrapper { padding: 20px 12px 40px !important; }
     .bmi-section-intro { margin-bottom: 20px !important; }
     .bmi-section-inner .container { padding: 0 !important; gap: 16px !important; }
+
+    /* Results area: fix content padding and card spacing */
+    .content { padding: 0 !important; }
+    .inline-welcome-box { padding: 24px 16px !important; margin-bottom: 12px !important; }
+    .bmi-display { padding: 24px 16px !important; margin-bottom: 16px !important; }
+    .bmi-value { font-size: 52px !important; }
+    .metrics-grid { gap: 10px !important; margin-bottom: 16px !important; }
+    .metric-card { padding: 16px !important; }
+    .metric-card value { font-size: 26px !important; }
+    .macros-section { padding: 20px 16px !important; margin-bottom: 16px !important; }
+    .macros-section h2 { font-size: 20px !important; margin-bottom: 14px !important; }
+    .macro-card { padding: 16px !important; }
+    .macro-value { font-size: 32px !important; }
+    .recommendations-box { padding: 20px 16px !important; margin-bottom: 16px !important; }
+    .health-alert { padding: 20px 16px !important; margin-bottom: 16px !important; }
+    .meals-section { margin-top: 20px !important; }
+    .meals-section h2 { font-size: 20px !important; margin-bottom: 14px !important; }
+    .weekly-planner-section { padding: 20px 16px !important; margin-top: 20px !important; }
+    .weekly-planner-section h2 { font-size: 20px !important; margin-bottom: 14px !important; }
+    .email-section { margin-top: 16px !important; padding: 16px !important; }
+    .budget-info { padding: 14px !important; margin-bottom: 12px !important; font-size: 15px !important; }
+    .info-box { padding: 24px 16px !important; margin-bottom: 16px !important; font-size: 16px !important; }
 }
 
 /* Mobile portrait (max-width: 480px) */
