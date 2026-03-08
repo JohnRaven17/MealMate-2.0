@@ -1,0 +1,2446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MealMate</title>
+<script>
+  if(localStorage.getItem('mm-theme')==='dark') document.documentElement.setAttribute('data-theme','dark');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mealmate.css">
+<link rel="stylesheet" href="Animations.css">
+<link rel="stylesheet" href="compatibility.css">
+<style>
+/* ===== SECTION SWITCHER ===== */
+#auth-section { display: block; }
+#app-section  { display: none; }
+
+/* When showing auth: body gets gold bg, flex column layout */
+body.auth-mode {
+  font-family: 'Arial Black', Arial, sans-serif;
+  background: #FFB800 !important;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+[data-theme=dark] body.auth-mode { background: #1a0808 !important; }
+
+/* Auth navbar */
+#authNav {
+  width: 100%;
+  background: linear-gradient(180deg, #f5a623 0%, #f5a623 72%, #b51f1f 72%, #b51f1f 100%);
+  height: 90px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; flex-shrink: 0; z-index: 10;
+  overflow: visible;
+}
+#authNav::after {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: radial-gradient(circle at 50% 0%, #b51f1f 69%, transparent 70%) 0 0 / 36px 20px repeat-x;
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* Particles always visible, sit behind everything */
+.bg-particles { pointer-events: none; }
+
+/* ===== AUTH STYLES (scoped) ===== */
+  :root{--red:#B80000;--red2:#8a0000;--gold:#FFB800;--gold2:#cc9200;--white:#fff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Arial Black',Arial,sans-serif;background:#e8970a;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;}
+
+  /* AUTH NAVBAR */
+  #auth-section .nav-logo-wrap{
+    background:var(--gold);border:5px solid var(--white);border-radius:20px;
+    padding:8px 18px;display:flex;align-items:center;justify-content:center;
+    width:160px;height:72px;overflow:hidden;
+    animation:navBob 3s ease-in-out infinite;
+    position:relative;z-index:12;
+  }
+  .nav-logo-wrap img{width:100%;height:100%;object-fit:contain;}
+  @keyframes navBob{0%,100%{transform:translateY(5px);}50%{transform:translateY(-3px);}}
+  #auth-section .nav-dark-btn{
+    position:absolute;right:24px;top:50%;transform:translateY(-50%);
+    background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.5);
+    border-radius:20px;padding:7px 16px;color:white;font-weight:800;
+    font-size:0.9rem;cursor:pointer;transition:background 0.2s;
+  }
+  #auth-section .nav-dark-btn:hover{background:rgba(255,255,255,0.3);}
+
+  /* PAGE BODY — dotted gold background */
+  #auth-section {
+    background: #e8970a;
+    position: relative;
+  }
+  #auth-section::before {
+    content:'';position:absolute;inset:0;
+    background-image: radial-gradient(circle, rgba(181,31,31,0.1) 1.5px, transparent 1.5px);
+    background-size: 26px 26px;
+    pointer-events:none;z-index:3;
+  }
+  #auth-section .page-body{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    padding:40px 60px 60px;gap:80px;flex-wrap:wrap;
+    position:relative;z-index:4;
+  }
+
+  /* BRAND SIDE */
+  #auth-section .brand-side{
+    display:flex;flex-direction:column;gap:16px;
+    animation:slideLeft 0.7s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes slideLeft{from{opacity:0;transform:translateX(-50px);}to{opacity:1;transform:translateX(0);}}
+  #auth-section .brand-pill{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--red);color:white;padding:10px 20px;
+    border-radius:999px;border:3px solid white;
+    box-shadow:0 6px 0 var(--red2);
+    font-size:1.1rem;font-weight:900;letter-spacing:2px;width:fit-content;
+  }
+  #auth-section .brand-pill.light{
+    background:white;color:var(--red);border-color:var(--red);box-shadow:0 6px 0 #ccc;
+  }
+  #auth-section .brand-headline{
+    color:white;
+    font-size:clamp(3.5rem,8vw,5.5rem);
+    font-weight:900;font-style:italic;line-height:0.88;
+    text-transform:uppercase;
+    text-shadow: 4px 4px 0 #c47a00, 6px 6px 0 rgba(0,0,0,0.15);
+    letter-spacing:-1px;
+  }
+
+  /* FORM CARD — phone mockup */
+  #auth-section .form-card{
+    background:#B80000;
+    border:6px solid white;
+    border-radius:32px;
+    padding:36px 32px 28px;
+    width:390px;max-width:100%;
+    box-shadow:0 22px 0 #8a0000, 0 28px 40px rgba(0,0,0,0.35);
+    transform:rotate(1.5deg);
+    animation:slideRight 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+  }
+  @keyframes slideRight{from{opacity:0;transform:rotate(1deg) translateX(50px);}to{opacity:1;transform:rotate(1deg) translateX(0);}}
+  #auth-section .form-title{
+    color:white;font-size:1.9rem;font-weight:900;
+    text-align:center;font-style:italic;
+    text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;
+  }
+  #auth-section .msg-box{padding:10px 14px;border-radius:10px;font-weight:800;font-size:0.85rem;text-align:center;margin-bottom:12px;display:none;}
+  #auth-section .msg-box.success{background:#10b981;color:white;display:block;}
+  #auth-section .msg-box.error{background:#ef4444;color:white;display:block;}
+
+  /* FIELDS */
+  #auth-section .field{margin-bottom:14px;}
+  #auth-section .field label{
+    display:block;color:var(--gold);
+    font-size:0.68rem;font-weight:900;
+    text-transform:uppercase;letter-spacing:2.5px;margin-bottom:5px;
+  }
+  #auth-section .field input{
+    width:100%;padding:12px 14px;
+    background:#FFB800;
+    border:3px solid rgba(255,255,255,0.6);border-radius:10px;
+    color:#7a1010;font-weight:900;font-size:0.9rem;
+    text-transform:uppercase;outline:none;
+    box-shadow:0 5px 0 #cc9200;
+    transition:transform 0.1s,box-shadow 0.1s;
+  }
+  #auth-section .field input[type=email],
+  #auth-section .field input[type=password]{text-transform:none;}
+  #auth-section #username, #auth-section #password { background:#fef3c7 !important; }
+  #auth-section .field input::placeholder{color:#a07020;font-weight:700;letter-spacing:1px;}
+  #auth-section .field input:focus{transform:translateY(2px);box-shadow:0 2px 0 #c47a00;background:#fff8e1;}
+  #auth-section .field-error{color:#ffdd57;font-size:0.7rem;font-weight:700;margin-top:3px;display:none;}
+
+  /* SUBMIT */
+  #auth-section .submit-btn{
+    width:100%;padding:14px;
+    background:var(--gold);color:var(--red);
+    border:3px solid white;border-radius:14px;
+    font-weight:900;font-size:1.05rem;
+    text-transform:uppercase;font-style:italic;letter-spacing:1px;
+    cursor:pointer;box-shadow:0 6px 0 var(--gold2);
+    transition:all 0.1s;margin-top:4px;margin-bottom:16px;
+  }
+  #auth-section .submit-btn:hover{background:#ffd04a;}
+  #auth-section .submit-btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--gold2);}
+
+  /* FOOTER */
+  #auth-section .form-footer{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  #auth-section .remember-label{display:flex;align-items:center;gap:6px;color:var(--gold);font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;cursor:pointer;}
+  #auth-section .remember-label input{width:14px;height:14px;cursor:pointer;accent-color:var(--gold);}
+  #auth-section .forgot-link{color:white;font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;text-decoration:none;}
+  #auth-section .forgot-link:hover{text-decoration:underline;}
+  #auth-section .toggle-row{text-align:center;color:var(--gold);font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;}
+  #auth-section .toggle-btn{background:none;border:none;color:white;font-weight:900;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;text-decoration:underline;cursor:pointer;padding:0;}
+
+  /* DARK MODE */
+  [data-theme=dark] body.auth-mode{background:#1a0808 !important;}
+  [data-theme=dark] #auth-section{background:#180606 !important;}
+  [data-theme=dark] #auth-section::before{background-image:radial-gradient(circle,rgba(244,173,40,0.07) 1.5px,transparent 1.5px) !important;}
+  [data-theme=dark] #auth-section .brand-headline{text-shadow:4px 4px 0 #7a3800,6px 6px 0 rgba(0,0,0,0.3);}
+  [data-theme=dark] #auth-section .form-card{background:#2a0808;border-color:#f4ad28;box-shadow:0 26px 0 #0a0000,0 32px 50px rgba(0,0,0,0.6);}
+  [data-theme=dark] #auth-section .field input{background:#2d1212;color:#f0d0a0;border-color:#f4ad28;box-shadow:0 4px 0 #110808;}
+  [data-theme=dark] #auth-section .field input:focus{background:#3a1818;}
+  [data-theme=dark] #auth-section .field input::placeholder{color:#8a5030;}
+
+  /* MOBILE */
+  @media(max-width:700px){
+    #auth-section .brand-side{display:none;}
+    #auth-section .form-card{transform:none;animation:none;opacity:1;width:100%;}
+    #auth-section .page-body{padding:20px 16px 40px;}
+  }
+
+/* ===== APP INLINE STYLES ===== */
+
+        :root {
+            --page-stripe1: #fdeaea; --page-stripe2: #ffffff;
+            --card-bg: #ffffff; --card-border: rgba(181,31,31,0.12);
+            --text: #2a1010; --text-muted: #7a4040;
+            --gold: #f4ad28; --gold-dark: #d28c1c;
+            --red: #b51f1f; --red-dark: #8f1818;
+            --input-bg: #f4ad28; --input-shadow: #d28c1c;
+            --shadow: rgba(181,31,31,0.18);
+        }
+        [data-theme="dark"] {
+            --page-stripe1: #1f0a0a; --page-stripe2: #180808;
+            --card-bg: #260e0e; --card-border: rgba(244,173,40,0.2);
+            --text: #f5e8e8; --text-muted: #c89898;
+            --input-bg: #3a1818; --input-shadow: #220c0c;
+            --shadow: rgba(0,0,0,0.5);
+        }
+        [data-theme="dark"] body { background-color: #180808; }
+        [data-theme="dark"] .main { background-image: linear-gradient(rgba(0,0,0,0.72) 50%, rgba(0,0,0,0.72) 50%), url(PNGS/Bg.jpg) !important; }
+        [data-theme="dark"] .panel { background: var(--card-bg) !important; border: 2px solid var(--card-border) !important; border-radius: 24px; }
+        [data-theme="dark"] .panel h1 { color: #ff8888; }
+        [data-theme="dark"] input, [data-theme="dark"] select { background: var(--input-bg) !important; box-shadow: 0 10px 0 var(--input-shadow) !important; }
+        [data-theme="dark"] .info-box { background: #2a0808 !important; border: 2px solid rgba(244,173,40,0.3) !important; }
+        [data-theme="dark"] .metric-card { background: var(--card-bg) !important; border: 2px solid var(--card-border) !important; }
+        [data-theme="dark"] .metric-card label { color: var(--text-muted) !important; }
+        [data-theme="dark"] .metric-card value { color: #ff8888 !important; }
+        [data-theme="dark"] .macros-section { background: var(--card-bg) !important; border: 2px solid var(--card-border) !important; }
+        [data-theme="dark"] .macros-section h2 { color: #ff8888 !important; }
+        [data-theme="dark"] .meal-card { background: var(--card-bg) !important; border: 2px solid var(--card-border) !important; }
+        [data-theme="dark"] .meal-content h3 { color: var(--text) !important; }
+        [data-theme="dark"] .meal-stats { color: var(--text-muted) !important; }
+        [data-theme="dark"] .recommendations-box { background: #2a2000 !important; }
+        [data-theme="dark"] .health-alert { background: #2a0808 !important; }
+        [data-theme="dark"] .weekly-planner-section { background: var(--card-bg) !important; border: 2px solid var(--card-border) !important; }
+        [data-theme="dark"] .weekly-table td { background: var(--card-bg) !important; color: var(--text) !important; border-color: var(--card-border) !important; }
+        [data-theme="dark"] .profile-dropdown { background: #260e0e !important; border-color: #f4ad28 !important; }
+        [data-theme="dark"] .profile-dropdown-item { color: var(--text) !important; }
+        [data-theme="dark"] .bmi-section-wrapper { background: repeating-linear-gradient(90deg, var(--page-stripe1), var(--page-stripe1) 40px, var(--page-stripe2) 40px, var(--page-stripe2) 80px) !important; }
+        [data-theme="dark"] .gallery-section { background: repeating-linear-gradient(90deg, var(--page-stripe1), var(--page-stripe1) 40px, var(--page-stripe2) 40px, var(--page-stripe2) 80px) !important; }
+        [data-theme="dark"] .features-section { background: #180808 !important; }
+
+        /* ===== SOFTER HEALTH ALERT ===== */
+        .health-alert-soft {
+            background: #fff8e1 !important;
+            border-left: 6px solid #f4ad28 !important;
+            padding: 24px 28px !important;
+            border-radius: 18px !important;
+            margin-bottom: 28px !important;
+        }
+        .health-alert-soft h3 { color: #8a6200 !important; font-size: 18px !important; margin-bottom: 10px !important; }
+        .health-alert-soft p { color: #7a5500 !important; font-size: 15px !important; line-height: 1.6 !important; }
+        [data-theme="dark"] .health-alert-soft { background: #2a1e00 !important; border-color: #f4ad28 !important; }
+        [data-theme="dark"] .health-alert-soft h3 { color: #f4ad28 !important; }
+        [data-theme="dark"] .health-alert-soft p { color: #d4a040 !important; }
+
+        /* ===== MEAL CARD — match theme ===== */
+        .meal-card { background: var(--card-bg) !important; border: 2px solid var(--card-border) !important; border-radius: 22px !important; }
+        .meal-content { background: var(--card-bg) !important; }
+        .meal-content h3 { color: var(--text) !important; }
+        .meal-stats { color: var(--text-muted) !important; }
+        .details p { color: var(--text-muted) !important; }
+        .bmi-display { background: var(--red) !important; }
+        .macros-section, .weekly-planner-section { background: var(--card-bg) !important; }
+
+        /* ===== DARK TOGGLE ===== */
+        .dark-toggle-btn {
+            background: rgba(255,255,255,0.18); border: 2.5px solid rgba(255,255,255,0.45);
+            border-radius: 24px; padding: 7px 16px; cursor: pointer; color: white;
+            font-size: 0.93rem; font-family: 'Arial Rounded MT Bold', sans-serif; font-weight: 700;
+            transition: background 0.2s; display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .dark-toggle-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* ===== PARTICLES ===== */
+        .bg-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .particle { position: absolute; opacity: 0; animation: floatUp linear infinite; }
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) rotate(0deg); opacity: 0; }
+            5% { opacity: 0.13; } 90% { opacity: 0.13; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ===== HERO ===== */
+        .hero-content-wrap {
+            position: relative; z-index: 2;
+            display: flex; align-items: center; justify-content: space-between;
+            max-width: 1280px; margin: 0 auto;
+            padding: 160px 60px 60px; gap: 40px; min-height: 100vh;
+        }
+        .hero-text-side { flex: 1; animation: heroLeft 0.9s cubic-bezier(0.22,1,0.36,1) forwards; }
+        @keyframes heroLeft { from{opacity:0;transform:translateX(-60px)} to{opacity:1;transform:translateX(0)} }
+        .hero-pretitle { font-size: 0.88rem; letter-spacing: 4px; color: #ffcc33; font-weight: 800; margin-bottom: 14px; text-transform: uppercase; }
+        .hero-h1 { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: clamp(3rem,6vw,5rem); color: white; line-height: 1.05; text-shadow: 3px 3px 0 rgba(0,0,0,0.25); margin-bottom: 20px; }
+        .hero-h1 .glow { color: #ffcc33; animation: goldGlow 2.5s ease-in-out infinite alternate; }
+        @keyframes goldGlow {
+            from { text-shadow: 3px 3px 0 rgba(0,0,0,0.25), 0 0 10px rgba(255,204,51,0.3); }
+            to   { text-shadow: 3px 3px 0 rgba(0,0,0,0.25), 0 0 38px rgba(255,204,51,0.88); }
+        }
+        .hero-sub { font-size: 1.08rem; color: rgba(255,255,255,0.82); font-weight: 600; line-height: 1.65; margin-bottom: 36px; font-family: 'Arial Rounded MT Bold', sans-serif; }
+        .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+        .btn-gold-hero { background: #f5a623; color: white; font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1.05rem; font-weight: 800; letter-spacing: 1px; padding: 14px 32px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 8px 0 #d28c1c, 0 12px 24px rgba(212,140,28,0.4); transition: all 0.15s; text-decoration: none; display: inline-block; }
+        .btn-gold-hero:hover { transform: translateY(-3px); box-shadow: 0 12px 0 #d28c1c, 0 16px 32px rgba(212,140,28,0.5); }
+        .btn-gold-hero:active { transform: translateY(4px); box-shadow: 0 4px 0 #d28c1c; }
+        .btn-outline-hero { background: transparent; color: white; font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1.05rem; font-weight: 800; padding: 12px 30px; border-radius: 50px; border: 3px solid rgba(255,255,255,0.45); cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .btn-outline-hero:hover { background: rgba(255,255,255,0.15); border-color: white; }
+        .hero-logo-side { flex: 0 0 400px; display: flex; align-items: center; justify-content: center; opacity: 0; animation: heroRight 0.9s cubic-bezier(0.22,1,0.36,1) 0.2s forwards; }
+        @keyframes heroRight { from{opacity:0;transform:translateX(60px)} to{opacity:1;transform:translateX(0)} }
+        .hero-logo-img { width: 380px; height: auto; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.45)); animation: logoPulse 4s ease-in-out infinite; }
+        @keyframes logoPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+
+        /* ===== MARQUEE TICKER (replaces static banner) ===== */
+        .ticker-wrap {
+            background: #f5a623;
+            overflow: hidden;
+            border-top: 4px solid #b51f1f;
+            border-bottom: 4px solid #b51f1f;
+            padding: 0;
+            white-space: nowrap;
+            position: relative;
+        }
+        .ticker-track {
+            display: inline-flex;
+            align-items: center;
+            animation: ticker 22s linear infinite;
+            gap: 0;
+        }
+        .ticker-wrap:hover .ticker-track { animation-play-state: paused; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 40px;
+            font-family: 'Arial Rounded MT Bold', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #b51f1f;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .ticker-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            background: #b51f1f;
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+        .ticker-item span.icon { font-size: 1.6rem; }
+
+        /* ===== BMI SECTION ===== */
+        .bmi-section-wrapper {
+            background: repeating-linear-gradient(90deg, #fdeaea, #fdeaea 40px, #ffffff 40px, #ffffff 80px);
+            padding: 70px 40px 80px;
+        }
+        .bmi-section-inner { max-width: 1400px; margin: 0 auto; }
+        .bmi-section-intro { text-align: center; margin-bottom: 46px; }
+        .sec-head { text-align: center; }
+        .sec-eyebrow { font-size: 0.86rem; letter-spacing: 4px; color: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 10px; font-family: 'Arial Rounded MT Bold', sans-serif; }
+        .sec-title { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: clamp(1.8rem,4vw,2.8rem); color: var(--red); line-height: 1.1; }
+        [data-theme="dark"] .sec-title { color: #ff8888; }
+        [data-theme="dark"] .sec-eyebrow { color: #f4ad28; }
+        .bmi-section-inner .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 460px 1fr; gap: 40px; align-items: start; }
+        .bmi-section-inner .panel { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 24px; box-shadow: 0 12px 0 var(--card-border), 0 14px 36px var(--shadow); position: sticky; top: 90px; }
+
+        /* Welcome box */
+        .inline-welcome-box { background: var(--red); color: white; border-radius: 22px; padding: 40px 32px; text-align: center; box-shadow: 0 10px 0 var(--red-dark), 0 12px 30px rgba(181,31,31,0.3); margin-bottom: 22px; }
+        .inline-welcome-box .w-icon { font-size: 3.2rem; margin-bottom: 14px; display: block; animation: bob 3s ease-in-out infinite; }
+        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .inline-welcome-box h2 { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1.55rem; margin-bottom: 10px; }
+        .inline-welcome-box p { font-size: 0.97rem; opacity: 0.88; line-height: 1.6; font-weight: 600; font-family: 'Arial Rounded MT Bold', sans-serif; }
+        .tips-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+        .tip-card { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 16px; padding: 18px 12px; text-align: center; box-shadow: 0 6px 0 var(--card-border); transition: all 0.25s; }
+        .tip-card:hover { transform: translateY(-5px); border-color: #f4ad28; }
+        .tip-icon { font-size: 1.7rem; margin-bottom: 7px; }
+        .tip-label { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 0.9rem; color: var(--red); margin-bottom: 4px; }
+        [data-theme="dark"] .tip-label { color: #ff8888; }
+        .tip-desc { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; line-height: 1.5; }
+
+        /* ===== FEATURES ===== */
+        .features-section { background: var(--page-stripe2); padding: 70px 40px; }
+        .feat-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 24px; }
+        .feat-card { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 22px; padding: 30px 20px; text-align: center; box-shadow: 0 8px 0 var(--card-border), 0 10px 28px var(--shadow); transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .feat-card:hover { transform: translateY(-8px); border-color: #f4ad28; }
+        .feat-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; animation: bob 3s ease-in-out infinite; }
+        .feat-card:nth-child(2) .feat-icon{animation-delay:.5s} .feat-card:nth-child(3) .feat-icon{animation-delay:1s} .feat-card:nth-child(4) .feat-icon{animation-delay:1.5s}
+        .feat-title { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1.25rem; color: var(--red); margin-bottom: 8px; }
+        [data-theme="dark"] .feat-title { color: #ff8888; }
+        .feat-desc { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; font-weight: 600; }
+
+        /* ===== GALLERY ===== */
+        .gallery-section { padding: 70px 40px; background: repeating-linear-gradient(90deg, #fdeaea, #fdeaea 40px, #ffffff 40px, #ffffff 80px); }
+        .gallery-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill,minmax(195px,1fr)); gap: 15px; }
+        .gal-item { border-radius: 18px; overflow: hidden; aspect-ratio: 1; cursor: pointer; box-shadow: 0 6px 0 var(--shadow), 0 8px 20px var(--shadow); transition: all 0.3s cubic-bezier(0.4,0,0.2,1); position: relative; }
+        .gal-item:hover { transform: scale(1.06) rotate(-1deg); z-index: 2; }
+        .gal-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; display: block; }
+        .gal-item:hover img { transform: scale(1.1); }
+        .gal-over { position: absolute; inset: 0; background: linear-gradient(to top, rgba(181,31,31,0.9) 0%, transparent 55%); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; padding: 12px; }
+        .gal-item:hover .gal-over { opacity: 1; }
+        .gal-label { color: white; font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 0.86rem; }
+
+        /* ===== STATS ===== */
+        .stats-strip { background: #b51f1f; padding: 40px 40px 55px; }
+
+        .stats-tagline {
+            text-align: center;
+            color: rgba(255,255,255,0.88);
+            font-size: 1rem;
+            font-weight: 600;
+            max-width: 680px;
+            margin: 0 auto 36px;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .stats-tagline strong { color: #ffcc33; }
+
+        .stats-row { max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 30px; text-align: center; }
+        .stat-val { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: clamp(2.5rem,5vw,4rem); color: #ffcc33; line-height: 1; margin-bottom: 8px; }
+        .stat-lbl { color: rgba(255,255,255,0.82); font-weight: 700; font-size: 1rem; }
+
+        /* ===== CTA ===== */
+        .cta-band { background: #f5a623; padding: 60px 40px; text-align: center; }
+        .cta-band h2 { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: clamp(1.8rem,4vw,3rem); color: #b51f1f; margin-bottom: 12px; }
+        .cta-band p { color: rgba(181,31,31,0.8); font-weight: 700; font-size: 1rem; margin-bottom: 30px; }
+        .btn-red-cta { background: #b51f1f; color: white; font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1.05rem; font-weight: 800; padding: 14px 36px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 8px 0 #8f1818; transition: all 0.15s; text-decoration: none; display: inline-block; }
+        .btn-red-cta:hover { transform: translateY(-3px); box-shadow: 0 12px 0 #8f1818; }
+
+        /* ===== FOOTER ===== */
+        .site-footer { background: #8f1818; color: rgba(255,255,255,0.65); padding: 40px; text-align: center; }
+        .ft-logo { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1.75rem; color: #ffcc33; margin-bottom: 10px; }
+        .ft-links { display: flex; justify-content: center; gap: 24px; margin: 16px 0; flex-wrap: wrap; }
+        .ft-links a { color: rgba(255,255,255,0.55); text-decoration: none; font-weight: 700; font-size: 0.88rem; transition: color 0.2s; }
+        .ft-links a:hover { color: #ffcc33; }
+        .ft-copy { font-size: 0.78rem; opacity: 0.45; }
+
+        /* ===== REVEAL ===== */
+        .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.vis { opacity: 1; transform: translateY(0); }
+
+        /* ===== MODAL ===== */
+        .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-bg.on { display: flex; }
+        .modal-box { background: var(--card-bg); border-radius: 26px; padding: 42px; max-width: 400px; width: 90%; text-align: center; border: 3px solid #f4ad28; box-shadow: 0 24px 60px rgba(0,0,0,0.4); animation: mPop 0.28s cubic-bezier(0.22,1,0.36,1); }
+        @keyframes mPop { from{opacity:0;transform:scale(0.85) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .m-icon { font-size: 3.5rem; margin-bottom: 14px; }
+        .m-title { font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1.6rem; color: var(--red); margin-bottom: 10px; }
+        [data-theme="dark"] .m-title { color: #ff8888; }
+        .m-desc { color: var(--text-muted); font-size: 0.94rem; line-height: 1.6; font-weight: 600; margin-bottom: 24px; }
+        .m-close { background: #b51f1f; color: white; font-family: 'Arial Rounded MT Bold', sans-serif; font-size: 1rem; padding: 12px 32px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 6px 0 #8f1818; transition: all 0.15s; }
+        .m-close:hover { background: #f5a623; box-shadow: 0 6px 0 #d28c1c; }
+
+        @media(max-width:900px) {
+            .hero-content-wrap { flex-direction: column; padding: 140px 24px 50px; text-align: center; }
+            .hero-logo-side { flex: none; }
+            .hero-logo-img { width: 200px; }
+            .hero-btns { justify-content: center; }
+            .bmi-section-inner .container { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr; }
+            .tips-row { grid-template-columns: 1fr; }
+        }
+        @media(max-width:560px) { .gallery-grid { grid-template-columns: repeat(2,1fr); } }
+
+        /* ===== NAV LOGO — centered with animation ===== */
+        .nav-logo {
+            position: absolute !important;
+            left: 50% !important;
+            margin-right: 0 !important;
+            animation: navFloat 3s ease-in-out infinite !important;
+        }
+        @keyframes navFloat {
+            0%,100% { transform: translateX(-50%) translateY(20px); }
+            50%      { transform: translateX(-50%) translateY(10px); }
+        }
+        .nav-logo:hover { animation-play-state: paused !important; }
+        #mainNav { position: fixed !important; } /* height controlled by mealmate.css */
+        #mainNav { overflow: visible !important; }
+        #mainNav::after {
+          content:'';
+          position:absolute;
+          bottom:-18px;
+          left:0;
+          width:100%;
+          height:20px;
+          background: radial-gradient(circle at 50% 0%, #b51f1f 69%, transparent 70%) 0 0 / 36px 20px repeat-x;
+          pointer-events:none;
+          z-index:1001;
+        }
+        #mainNav.scrolled::after { display:none; }
+        .nav-logo { z-index: 1002 !important; }
+        #authNav { overflow: visible !important; }
+        #authNav::after { z-index: 11 !important; }
+        #auth-section .nav-logo-wrap { z-index: 12 !important; position: relative !important; }
+
+    
+
+
+
+
+        /* Smooth dark/light page transition */
+        #auth-section, #auth-section * {
+          transition: background-color 0.4s ease, color 0.3s ease, border-color 0.3s ease !important;
+        }
+        .auth-phone, .auth-form-inner, .auth-field, #auth-section input {
+          transition: background-color 0.4s ease, color 0.3s ease !important;
+        }
+
+  /* ── MOBILE AUTH NAV ── */
+  @media(max-width:768px){
+    #authNav { height:70px; }
+    #authNav::after { bottom:-16px; height:18px; background-size:28px 18px; }
+    #auth-section .nav-logo-wrap img { height:44px; }
+    .nav-dark-btn { font-size:0.78rem; padding:5px 10px; }
+    .auth-wrap { flex-direction:column; padding:20px 16px; gap:20px; }
+    .auth-hero { display:none; }
+    .auth-phone { max-width:100%; min-width:unset; width:100%; }
+  }
+  @media(max-width:480px){
+    #authNav { height:62px; }
+    .auth-phone { padding:24px 16px 20px; border-radius:24px; }
+    .auth-field { font-size:0.85rem; }
+  }
+
+</style>
+</head>
+<body class="auth-mode">
+
+<!-- Particles: always in DOM, show on both pages -->
+<div class="bg-particles" id="bgParticles" style="position:fixed;inset:0;z-index:2;overflow:hidden;pointer-events:none;"></div>
+
+<!-- ============================================================ -->
+<!-- AUTH SECTION                                                  -->
+<!-- ============================================================ -->
+<div id="auth-section" style="position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;">
+<nav id="authNav">
+  <div class="nav-logo-wrap">
+    <img src="PNGS/tag.png" alt="MealMate">
+  </div>
+  <button class="nav-dark-btn" id="authDarkBtn" onclick="toggleAuthDark()">🌙 Dark</button>
+  <button class="nav-dark-btn" onclick="toggleParticles()" style="right:120px;" title="Toggle particles">✨</button>
+</nav>
+
+<div class="page-body">
+  <div class="brand-side">
+    <div class="brand-pill"><span>🍴</span><span id="bLabel1">FOOD</span></div>
+    <div class="brand-headline" id="bHead1">MORE</div>
+    <div class="brand-headline" id="bHead2">EASIER!</div>
+    <div class="brand-pill light"><span>💰</span><span id="bLabel2">BUDGETING</span></div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-title" id="formTitle">Sign Up</div>
+    <div class="msg-box" id="msgBox"></div>
+    <div id="signupFields">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="fullName" placeholder="YOUR NAME" autocomplete="name">
+        <div class="field-error" id="errFullName"></div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="your@email.com" style="text-transform:none" autocomplete="email">
+        <div class="field-error" id="errEmail"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="USERNAME" autocomplete="username">
+      <div class="field-error" id="errUsername"></div>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      <div class="field-error" id="errPassword"></div>
+    </div>
+    <button class="submit-btn" onclick="handleSubmit()">
+      <span id="submitText">LET'S START! →</span>
+    </button>
+    <div class="form-footer">
+      <label class="remember-label"><input type="checkbox" id="rememberMe"> Remember me</label>
+      <a class="forgot-link" href="#" onclick="alert('Password reset coming soon!');return false;">Forgot?</a>
+    </div>
+    <div class="toggle-row">
+      <span id="toggleHint">Got a seat?</span>
+      <button class="toggle-btn" onclick="toggleMode()"><span id="toggleBtn">Sign In</span></button>
+    </div>
+  </div>
+</div>
+</div><!-- end #auth-section -->
+
+<!-- ============================================================ -->
+<!-- APP SECTION                                                   -->
+<!-- ============================================================ -->
+<div id="app-section" style="display:none;">
+<!-- ===== NAVBAR — original Navbar.png style ===== -->
+<nav id="mainNav">
+    <div class="nav-left">
+        <a href="#" onclick="scrollToSection('bmi-section');return false;">🧮 BMI</a>
+        <a href="#" onclick="scrollToSection('gallery');return false;">🍜 Gallery</a>
+        <a href="#" onclick="scrollToSection('features-section');return false;">⭐ Why Us</a>
+    </div>
+
+    <div class="nav-logo">
+        <img src="PNGS/tag.png" alt="Meal Mate">
+    </div>
+
+    <div class="nav-right" style="position:relative;display:flex;align-items:center;gap:12px;">
+        <button class="dark-toggle-btn" onclick="toggleDarkMode()" id="darkBtn">🌙 <span class="btn-label">Dark</span></button>
+        <button class="dark-toggle-btn" onclick="toggleParticles()" id="particleBtn" title="Toggle particle effects">✨ <span class="btn-label">Effects</span></button>
+        <div class="user-profile" id="userProfile" onclick="toggleProfileDropdown()">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">User</div>
+                <div class="user-email" id="userEmail">user@mealmate.local</div>
+            </div>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <button class="profile-dropdown-item" onclick="viewProfile()">👤 View Profile</button>
+            <button class="profile-dropdown-item" onclick="editProfile()">✏️ Edit Profile</button>
+            <button class="profile-dropdown-item" onclick="viewSettings()">⚙️ Settings</button>
+            <div class="profile-dropdown-divider"></div>
+            <button class="profile-dropdown-item logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div class="main">
+    <div class="hero-content-wrap">
+        <div class="hero-text-side">
+            <p class="hero-pretitle">🍽️ SMART MONEY · SMART FOOD</p>
+            <h1 class="hero-h1">Eat Well,<br><span class="glow">Budget Better.</span></h1>
+            <p class="hero-sub">Personalized Filipino meal plans based on<br>your BMI, goals, and budget — all in one place.</p>
+            <div class="hero-btns">
+                <a href="#bmi-section" class="btn-gold-hero">🚀 Try the Calculator</a>
+                <a href="#gallery" class="btn-outline-hero">🖼️ Food Gallery</a>
+            </div>
+        </div>
+        <div class="hero-logo-side">
+            <img src="PNGS/logo.png" alt="MealMate Logo" class="hero-logo-img">
+        </div>
+    </div>
+</div>
+
+<!-- ===== MARQUEE TICKER (replaces static banner) ===== -->
+<div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack">
+        <!-- Items duplicated by JS for seamless loop -->
+    </div>
+</div>
+
+<!-- ===== BMI CALCULATOR (2nd section, right after hero) ===== -->
+<section class="bmi-section-wrapper" id="bmi-section" style="padding-top:20px;">
+    <div class="bmi-section-inner">
+        <div class="bmi-section-intro sec-head reveal">
+            <p class="sec-eyebrow">Try It Now</p>
+            <h2 class="sec-title">Your Personal BMI & Meal Planner</h2>
+        </div>
+        <div class="container">
+            <div class="panel">
+                <h1>🏃 BMI CALCULATOR</h1>
+                <input type="number" id="weight" placeholder="Weight (kg)" min="20" max="300" step="0.1">
+                <input type="number" id="height" placeholder="Height (cm)" min="100" max="250" step="0.1">
+                <input type="number" id="age" placeholder="Age (years)" min="10" max="120">
+                <div class="gender-group">
+                    <button class="gender-btn active" data-gender="male">MALE</button>
+                    <button class="gender-btn" data-gender="female">FEMALE</button>
+                </div>
+                <select id="activity">
+                    <option value="" disabled selected>Activity Level</option>
+                    <option value="1.2">Sedentary</option>
+                    <option value="1.375">Lightly Active</option>
+                    <option value="1.55">Moderately Active</option>
+                    <option value="1.725">Very Active</option>
+                    <option value="1.9">Athlete</option>
+                </select>
+                <select id="goal">
+                    <option value="" disabled selected>Goal</option>
+                    <option value="lose">Lose Weight</option>
+                    <option value="maintain">Maintain Weight</option>
+                    <option value="gain">Gain Muscle</option>
+                </select>
+                <input type="number" id="budget" placeholder="Budget per meal (₱150 min)" min="150" step="10">
+                <button id="calculateBtn">CALCULATE</button>
+            </div>
+            <div class="content">
+                <div id="welcomeArea">
+                    <div class="inline-welcome-box">
+                        <span class="w-icon">🥗</span>
+                        <h2>Welcome, <span id="welcomeUser">Friend</span>!</h2>
+                        <p>Enter your details to calculate your BMI and get personalized Filipino meal recommendations.</p>
+                    </div>
+                    <div class="tips-row">
+                        <div class="tip-card"><div class="tip-icon">⚖️</div><div class="tip-label">BMI Range</div><div class="tip-desc">18.5–24.9 is the healthy BMI range for adults</div></div>
+                        <div class="tip-card"><div class="tip-icon">🍚</div><div class="tip-label">Budget Meals</div><div class="tip-desc">Filipino meals starting at ₱150</div></div>
+                        <div class="tip-card"><div class="tip-icon">💪</div><div class="tip-label">3 Goals</div><div class="tip-desc">Lose, maintain, or build muscle</div></div>
+                    </div>
+                </div>
+                <div class="info-box" id="initialMessage" style="display:none;">
+                    Welcome <strong id="welcomeUser2">User</strong>! Enter your details to get started.
+                </div>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== GALLERY (shown first, bigger/more visual) ===== -->
+<section class="gallery-section" id="gallery">
+    <div class="sec-head reveal" style="margin-bottom:44px;">
+        <p class="sec-eyebrow">Food Gallery</p>
+        <h2 class="sec-title">Delicious Meals Await 🍜</h2>
+    </div>
+    <div class="gallery-grid" id="galGrid"></div>
+</section>
+
+<!-- ===== FEATURES (smaller cards, shown after gallery) ===== -->
+<section class="features-section" id="features-section">
+    <div class="sec-head reveal" style="margin-bottom:46px;">
+        <p class="sec-eyebrow">Why MealMate?</p>
+        <h2 class="sec-title">Everything you need, in one delicious app</h2>
+    </div>
+    <div class="feat-grid">
+        <div class="feat-card reveal"><span class="feat-icon">🧮</span><div class="feat-title">BMI Calculator</div><div class="feat-desc">Accurate BMI, TDEE, and macro breakdowns tailored to your body and goals.</div></div>
+        <div class="feat-card reveal"><span class="feat-icon">🍛</span><div class="feat-title">Filipino Meals</div><div class="feat-desc">Curated meals from budget-friendly Philippine cuisine — ₱150 to ₱300 per meal.</div></div>
+        <div class="feat-card reveal"><span class="feat-icon">💸</span><div class="feat-title">Budget-Smart</div><div class="feat-desc">Set your budget and get meals that hit your macros without breaking the bank.</div></div>
+        <div class="feat-card reveal"><span class="feat-icon">📅</span><div class="feat-title">Weekly Planner</div><div class="feat-desc">Full 7-day meal plans organized by goal — lose, maintain, or gain muscle.</div></div>
+    </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="stats-strip">
+    <div class="stats-tagline reveal">
+        🇵🇭 &nbsp;All meals are rooted in authentic <strong>Philippine cuisine</strong> — from budget silog to hearty ulam, crafted for the Filipino table.
+    </div>
+    <div class="stats-row">
+        <div class="reveal"><div class="stat-val">45+</div><div class="stat-lbl">Filipino Meals</div></div>
+        <div class="reveal"><div class="stat-val">₱150</div><div class="stat-lbl">Starting Budget</div></div>
+        <div class="reveal"><div class="stat-val">3</div><div class="stat-lbl">Fitness Goals</div></div>
+    </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-band">
+    <h2>Want the full meal planning experience? 🍜</h2>
+    <p>Open the dedicated page for weekly planning, email export, and more.</p>
+    <a href="#" onclick="scrollToSection('bmi-section');return false;" class="btn-red-cta">🚀 Try the Meal Planner</a>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+    <div class="ft-logo">🍽️ MealMate</div>
+    <p style="font-weight:600;margin-bottom:10px;opacity:0.65;">Smart Money · Smart Food</p>
+    <div class="ft-links">
+        <a href="#" onclick="scrollToSection('bmi-section');return false;">🧮 BMI Calculator</a>
+        <a href="#" onclick="scrollToSection('gallery');return false;">🍜 Food Gallery</a>
+        <a href="#" onclick="scrollToSection('features-section');return false;">⭐ Why MealMate</a>
+    </div>
+    <p class="ft-copy">© 2025 MealMate. A project for smarter, healthier eating.</p>
+</footer>
+
+<!-- GALLERY MODAL -->
+<!-- GALLERY MODAL -->
+<div class="modal-bg" id="galModal">
+    <div class="modal-box">
+        <div class="m-icon" id="mIcon">🍛</div>
+        <h2 class="m-title" id="mTitle">Meal</h2>
+        <p class="m-desc" id="mDesc">A classic Filipino dish.</p>
+        <button class="m-close">Got it! 👍</button>
+    </div>
+</div>
+</div><!-- end #app-section -->
+
+<script>
+// ============================================================
+// 🔀 SECTION SWITCHER
+// Think of the page as ONE page with two rooms:
+//   Room 1 = Auth page (login/signup)
+//   Room 2 = App page (the actual meal planner)
+// showAuth() takes you to Room 1, showApp() takes you to Room 2.
+// ============================================================
+// ============================================================
+function showAuth() {
+  document.getElementById('auth-section').style.display = 'flex';
+  document.getElementById('app-section').style.display  = 'none';
+  document.body.className = 'auth-mode';
+  document.title = 'MealMate — Sign In';
+  setTimeout(applyParticleVisibility, 50);
+  var mb = document.getElementById('msgBox'); if(mb){mb.style.display='none';mb.textContent='';}
+}
+
+function showApp() {
+  document.getElementById('auth-section').style.display = 'none';
+  document.getElementById('app-section').style.display  = 'block';
+  document.body.className = '';
+  document.title = 'MealMate — Smart Money, Smart Food';
+  setTimeout(applyParticleVisibility, 50);
+  loadUserProfile();
+  initApp();
+}
+
+// ============================================================
+// 🔐 AUTH LOGIC
+// Handles everything on the login/signup form:
+//   - handleSubmit()  → when you click "Let's Start" or "Let's Eat"
+//   - toggleMode()    → switches between Sign Up and Sign In form
+//   - showMsg()       → shows green/red message boxes on the form
+// Accounts are saved in localStorage (your browser's memory).
+// ============================================================
+// ============================================================
+var isLogin = false;
+
+function toggleAuthDark() {
+  var d = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', d ? 'light' : 'dark');
+  document.getElementById('authDarkBtn').textContent = d ? '🌙 Dark' : '☀️ Light';
+  localStorage.setItem('mm-theme', d ? 'light' : 'dark');
+}
+
+function toggleMode() {
+  isLogin = !isLogin;
+  // Clear any leftover messages when switching modes
+  var mb = document.getElementById('msgBox');
+  if(mb) { mb.style.display='none'; mb.textContent=''; }
+  document.getElementById('signupFields').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('formTitle').textContent = isLogin ? 'Sign In' : 'Sign Up';
+  document.getElementById('submitText').textContent = isLogin ? "LET'S EAT! →" : "LET'S START! →";
+  document.getElementById('toggleHint').textContent = isLogin ? 'New here?' : 'Got a seat?';
+  document.getElementById('toggleBtn').textContent = isLogin ? 'Sign Up' : 'Sign In';
+  document.getElementById('bLabel1').textContent = isLogin ? 'FOOD' : 'JOIN';
+  document.getElementById('bHead1').textContent = isLogin ? 'MORE' : "LET'S";
+  document.getElementById('bHead2').textContent = isLogin ? 'EASIER!' : 'START!';
+  document.getElementById('bLabel2').textContent = isLogin ? 'BUDGETING' : 'COOKING';
+  clearErrors(); hideMsg();
+}
+
+function showErr(id, msg) { var e=document.getElementById(id); e.textContent=msg; e.style.display='block'; }
+function clearErrors() { ['errFullName','errEmail','errUsername','errPassword'].forEach(function(id){ var e=document.getElementById(id); e.textContent=''; e.style.display='none'; }); }
+function showMsg(t, type) { var e=document.getElementById('msgBox'); e.textContent=t; e.className='msg-box '+type; }
+function hideMsg() { document.getElementById('msgBox').className='msg-box'; }
+
+function handleSubmit() {
+  clearErrors(); hideMsg();
+  var username = document.getElementById('username').value.trim();
+  var password = document.getElementById('password').value;
+  var remember = document.getElementById('rememberMe').checked;
+  var ok = true;
+  if(username.length < 2) { showErr('errUsername','Username required'); ok=false; }
+  if(password.length < 6) { showErr('errPassword','Min 6 characters'); ok=false; }
+
+  if(!isLogin) {
+    var fullName = document.getElementById('fullName').value.trim();
+    var email = document.getElementById('email').value.trim();
+    if(fullName.length < 2) { showErr('errFullName','Full name required'); ok=false; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('errEmail','Valid email required'); ok=false; }
+    if(!ok) return;
+    var p = {id:Date.now(),fullName:fullName,username:username,email:email,password:password,createdAt:new Date().toISOString()};
+    localStorage.setItem('mealmate_current_user', JSON.stringify(p));
+    var accs = JSON.parse(localStorage.getItem('mm_accounts')||'[]');
+    var idx = accs.findIndex(function(a){return a.username===username;});
+    if(idx>=0) accs[idx]=p; else accs.push(p);
+    localStorage.setItem('mm_accounts', JSON.stringify(accs));
+    if(remember) localStorage.setItem('mm_remember', username);
+    showMsg('🎉 Account created!','success');
+    setTimeout(showApp, 800);
+  } else {
+    if(!ok) return;
+    var accs2 = JSON.parse(localStorage.getItem('mm_accounts')||'[]');
+    var match = accs2.find(function(a){return a.username===username;});
+    var p2;
+    if(match) {
+      if(match.password && match.password!==password) { showMsg('❌ Wrong password.','error'); return; }
+      p2 = {id:match.id,fullName:match.fullName,username:match.username,email:match.email,password:match.password,createdAt:match.createdAt,loginAt:new Date().toISOString()};
+    } else {
+      p2 = {id:Date.now(),fullName:username,username:username,email:username+'@mealmate.local',loginAt:new Date().toISOString()};
+    }
+    localStorage.setItem('mealmate_current_user', JSON.stringify(p2));
+    if(remember) localStorage.setItem('mm_remember', username);
+    showMsg('🍽️ Welcome back!','success');
+    setTimeout(showApp, 800);
+  }
+}
+
+document.addEventListener('keydown', function(e){ if(e.key==='Enter') handleSubmit(); });
+var _rem = localStorage.getItem('mm_remember');
+if(_rem) { document.getElementById('username').value=_rem; document.getElementById('rememberMe').checked=true; }
+
+// ============================================================
+// MEALMATE JS (inlined)
+// ============================================================
+const MEALS = [
+
+/* =====================================================
+   💸 ₱100–₱150
+===================================================== */
+
+// 🔻 LOSE (ORIGINAL)
+{
+    name: "Sardinas Guisado + Egg + Rice (W/Greens)",
+    price: 111,
+    calories: "420–480 kcal",
+    protein: 28,
+    carbs: 55,
+    fat: 12,
+    why: "Very affordable, high protein, omega-3 rich",
+    ingredients: "Sardinas, egg, tomato, onion, pechay/kangkong, rice",
+    recipe: "Sauté tomato and onion, add sardines and vegetables.",
+    goal: "lose",
+    image: "PNGS/8.jpg"
+},
+{
+    name: "Tofu & Vegetable Stir-Fry + Egg + Rice",
+    price: 111,
+    calories: "420–480 kcal",
+    protein: 28,
+    carbs: 55,
+    fat: 12,
+    why: "Very affordable, high protein, omega-3 rich",
+    ingredients: "Sardinas, egg, tomato, onion, pechay/kangkong, rice",
+    recipe: "Sauté tomato and onion, add sardines and vegetables. Crack egg and simmer. Serve with rice.",
+    goal: "lose",
+    image: "PNGS/17.jpg"
+},
+{
+    name: "Ginisang Monggo + Tofu + Rice",
+    price: 115,
+    calories: "400–450 kcal",
+    protein: 22,
+    carbs: 60,
+    fat: 10,
+    why: "High fiber, plant protein",
+    ingredients: "Monggo, tofu, greens, rice",
+    recipe: "Boil monggo, sauté with tofu.",
+    goal: "lose",
+    image: "PNGS/6.jpg"
+},
+{
+    name: "Tofu & Vegetable Stir-Fry + Rice",
+    price: 136,
+    calories: "450–500 kcal",
+    protein: 20,
+    carbs: 65,
+    fat: 12,
+    why: "Balanced plant protein and vegetables",
+    ingredients: "Tokwa, mixed vegetables, egg, garlic, onion, rice",
+    recipe: "Stir-fry garlic and onion, add tofu and vegetables.",
+    goal: "lose",
+    image: "PNGS/5.jpg"
+},
+{
+    name: "Tofu & Vegetable Stir-Fry + Egg + Rice",
+    price: 136,
+    calories: "450–500 kcal",
+    protein: 20,
+    carbs: 65,
+    fat: 12,
+    why: "Balanced plant protein and vegetables",
+    ingredients: "Tokwa, mixed vegetables, egg, garlic, onion, rice",
+    recipe: "Stir-fry garlic and onion, add tofu and vegetables. Top with egg and serve with rice.",
+    goal: "lose",
+    image: "PNGS/16.jpg"
+},
+
+// 🔻 LOSE (ADDED)
+{
+    name: "Ginisang Sayote + Egg + Rice (original)",
+    price: 120,
+    calories: "380–420 kcal",
+    protein: 18,
+    carbs: 55,
+    fat: 9,
+    goal: "lose",
+    image: "PNGS/8.jpg"
+},
+
+// ⚖️ MAINTAIN (ADDED)
+{
+    name: "Tortang Talong + Rice",
+    price: 130,
+    calories: "450–500 kcal",
+    protein: 18,
+    carbs: 65,
+    fat: 14,
+    goal: "maintain",
+    image: "PNGS/19.jpg"
+},
+{
+    name: "Itlog na Maalat + Kamatis + Rice",
+    price: 120,
+    calories: "450–480 kcal",
+    protein: 16,
+    carbs: 60,
+    fat: 15,
+    goal: "maintain",
+    image: "PNGS/20.jpg"
+},
+{
+    name: "Ginisang Repolyo + Egg + Rice",
+    price: 125,
+    calories: "440–480 kcal",
+    protein: 17,
+    carbs: 60,
+    fat: 13,
+    goal: "maintain",
+    image: "PNGS/21.jpg"
+},
+{
+    name: "Pritong Itlog + Saging + Rice",
+    price: 110,
+    calories: "460–500 kcal",
+    protein: 15,
+    carbs: 70,
+    fat: 14,
+    goal: "maintain",
+    image: "PNGS/22.jpg"
+},
+{
+    name: "Ginisang Togue + Rice",
+    price: 115,
+    calories: "430–470 kcal",
+    protein: 16,
+    carbs: 60,
+    fat: 12,
+    goal: "maintain",
+    image: "PNGS/23.jpg"
+},
+
+// 🔺 GAIN (ADDED)
+{
+    name: "Egg Fried Rice (Homestyle)",
+    price: 150,
+    calories: "750–800 kcal",
+    protein: 26,
+    carbs: 85,
+    fat: 30,
+    goal: "gain",
+    image: "PNGS/24.jpg"
+},
+{
+    name: "Hotdog Omelette + Rice",
+    price: 135,
+    calories: "680–720 kcal",
+    protein: 28,
+    carbs: 70,
+    fat: 32,
+    goal: "gain",
+    image: "PNGS/25.jpg"
+},
+{
+    name: "Tortang Sardinas + Rice",
+    price: 130,
+    calories: "700–740 kcal",
+    protein: 30,
+    carbs: 65,
+    fat: 35,
+    goal: "gain",
+    image: "PNGS/26.jpg"
+},
+{
+    name: "Pritong Tofu + Rice + Mayo",
+    price: 145,
+    calories: "720–760 kcal",
+    protein: 24,
+    carbs: 70,
+    fat: 38,
+    goal: "gain",
+    image: "PNGS/27.jpg"
+},
+{
+    name: "Fried Egg + Rice + Peanut Butter",
+    price: 140,
+    calories: "650–700 kcal",
+    protein: 22,
+    carbs: 75,
+    fat: 30,
+    goal: "gain",
+    image: "PNGS/28.jpg"
+},
+
+
+/* =====================================================
+   💸 ₱150–₱200
+===================================================== */
+
+// 🔻 LOSE (5)
+{
+    name: "Chicken Tinola + Rice",
+    price: 190,
+    calories: "450–500 kcal",
+    protein: 35,
+    carbs: 50,
+    fat: 8,
+    why: "Light soup meal, immune-boosting veggies",
+    ingredients: "Chicken, papaya, malunggay, ginger, rice",
+    recipe: "Simmer chicken with ginger, add vegetables.",
+    goal: "lose",
+    image: "PNGS/7.jpg" // ORIGINAL
+},
+{
+    name: "Nilagang Itlog + Ensaladang Pipino + Rice",
+    price: 180,
+    calories: "400–430 kcal",
+    protein: 20,
+    carbs: 55,
+    fat: 10,
+    goal: "lose",
+    image: "PNGS/29.jpg"
+},
+{
+    name: "Tinolang Isda + Rice",
+    price: 200,
+    calories: "430–470 kcal",
+    protein: 32,
+    carbs: 55,
+    fat: 9,
+    goal: "lose",
+    image: "PNGS/30.jpg"
+},
+{
+    name: "Inihaw na Tilapia + Rice",
+    price: 200,
+    calories: "450–480 kcal",
+    protein: 38,
+    carbs: 55,
+    fat: 10,
+    goal: "lose",
+    image: "PNGS/31.jpg"
+},
+{
+    name: "Ginisang Ampalaya + Egg + Rice",
+    price: 170,
+    calories: "420–460 kcal",
+    protein: 22,
+    carbs: 55,
+    fat: 10,
+    goal: "lose",
+    image: "PNGS/32.jpg"
+},
+
+// ⚖️ MAINTAIN (5)
+{
+    name: "Ginisang Sardinas + Rice",
+    price: 190,
+    calories: "580–620 kcal",
+    protein: 30,
+    carbs: 65,
+    fat: 20,
+    goal: "maintain",
+    image: "PNGS/33.jpg"
+},
+{
+    name: "Chicken Omelette + Rice",
+    price: 180,
+    calories: "600–650 kcal",
+    protein: 35,
+    carbs: 60,
+    fat: 22,
+    goal: "maintain",
+    image: "PNGS/34.jpg"
+},
+{
+    name: "Pritong Tilapia + Ensalada + Rice",
+    price: 200,
+    calories: "600–650 kcal",
+    protein: 40,
+    carbs: 65,
+    fat: 20,
+    goal: "maintain",
+    image: "PNGS/35.jpg"
+},
+{
+    name: "Pork Giniling (Lean) + Rice",
+    price: 200,
+    calories: "620–660 kcal",
+    protein: 34,
+    carbs: 65,
+    fat: 20,
+    goal: "maintain",
+    image: "PNGS/36.jpg"
+},
+{
+    name: "Chicken Guisado + Rice",
+    price: 190,
+    calories: "620–650 kcal",
+    protein: 38,
+    carbs: 68,
+    fat: 18,
+    goal: "maintain",
+    image: "PNGS/37.jpg"
+},
+
+// 🔺 GAIN (5)
+{
+    name: "Longganisa + Egg + Rice",
+    price: 190,
+    calories: "880–920 kcal",
+    protein: 35,
+    carbs: 80,
+    fat: 45,
+    goal: "gain",
+    image: "PNGS/38.jpg"
+},
+{
+    name: "Corned Beef + Rice",
+    price: 180,
+    calories: "850–900 kcal",
+    protein: 40,
+    carbs: 70,
+    fat: 42,
+    goal: "gain",
+    image: "PNGS/39.jpg"
+},
+{
+    name: "Pritong Manok (Leg Quarter) + Rice",
+    price: 200,
+    calories: "850–900 kcal",
+    protein: 45,
+    carbs: 75,
+    fat: 40,
+    goal: "gain",
+    image: "PNGS/40.jpg"
+},
+{
+    name: "Chicken Fried Rice",
+    price: 190,
+    calories: "820–880 kcal",
+    protein: 40,
+    carbs: 90,
+    fat: 32,
+    goal: "gain",
+    image: "PNGS/41.jpg"
+},
+{
+    name: "Pork Chop + Rice",
+    price: 200,
+    calories: "900–950 kcal",
+    protein: 50,
+    carbs: 70,
+    fat: 45,
+    goal: "gain",
+    image: "PNGS/42.jpg"
+},
+
+
+/* =====================================================
+   💸 ₱300–₱400
+===================================================== */
+
+// 🔻 LOSE (₱300–₱400)
+{
+    name: "Chicken Breast Tinola + Rice",
+    price: 350,
+    calories: "450–500 kcal",
+    protein: 42,
+    carbs: 50,
+    fat: 9,
+    goal: "lose",
+    image: "PNGS/43.jpg"
+},
+{
+    name: "Inihaw na Bangus (Small) + Rice",
+    price: 380,
+    calories: "480–520 kcal",
+    protein: 40,
+    carbs: 55,
+    fat: 14,
+    goal: "lose",
+    image: "PNGS/44.jpg"
+},
+{
+    name: "Steamed Tilapia + Ensalada + Rice",
+    price: 360,
+    calories: "470–510 kcal",
+    protein: 38,
+    carbs: 55,
+    fat: 10,
+    goal: "lose",
+    image: "PNGS/45.jpg"
+},
+
+
+// ⚖️ MAINTAIN (ORIGINAL)
+{
+    name: "Tuna Omelette + Rice + Sautéed Kangkong",
+    price: 330,
+    calories: "500–550 kcal",
+    protein: 38,
+    carbs: 55,
+    fat: 15,
+    why: "Omega-3 from tuna + protein from eggs",
+    ingredients: "Tuna, eggs, rice, kangkong, garlic",
+    recipe: "Cook omelette, sauté kangkong, serve with rice.",
+    goal: "maintain",
+    image: "PNGS/2.jpg"
+},
+{
+    name: "Grilled Chicken Breast + Brown Rice + Steamed Veggies",
+    price: 350,
+    calories: "450–500 kcal",
+    protein: 45,
+    carbs: 50,
+    fat: 8,
+    why: "High protein, low fat, good fiber",
+    ingredients: "Chicken breast (150g), brown rice, carrots, broccoli",
+    recipe: "Grill chicken, cook rice, steam vegetables.",
+    goal: "maintain",
+    image: "PNGS/1.jpg"
+},
+{
+    name: "Pork Sinigang + Garlic Fried Rice + Ensalada",
+    price: 360,
+    calories: "700–750 kcal",
+    protein: 45,
+    carbs: 70,
+    fat: 28,
+    why: "Balanced comfort meal with vegetables and protein",
+    ingredients: "Pork belly, tamarind, kangkong, okra, rice",
+    recipe: "Cook pork sinigang, fry rice with garlic.",
+    goal: "maintain",
+    image: "PNGS/11.jpg"
+},
+{
+    name: "Grilled Bangus + Ensaladang Talong + Rice",
+    price: 380,
+    calories: "520–560 kcal",
+    protein: 42,
+    carbs: 55,
+    fat: 18,
+    why: "Good fats, heart-friendly fish",
+    ingredients: "Bangus, eggplant, tomato, onion, rice",
+    recipe: "Grill bangus, prepare eggplant salad.",
+    goal: "maintain",
+    image: "PNGS/4.jpg"
+},
+
+// 🔺 GAIN (ORIGINAL)
+{
+    name: "Beef Kaldereta + Buttered Vegetables + Rice",
+    price: 400,
+    calories: "800–850 kcal",
+    protein: 55,
+    carbs: 75,
+    fat: 32,
+    why: "Rich in protein and calories for muscle gain",
+    ingredients: "Beef, potatoes, carrots, bell pepper, tomato sauce, rice",
+    recipe: "Simmer beef in kaldereta sauce with vegetables.",
+    goal: "gain",
+    image: "PNGS/13.jpg"
+},
+
+/* =====================================================
+   💸 ₱400–₱500
+===================================================== */
+
+// 🔻 LOSE (ORIGINAL)
+{
+    name: "Sinigang na Baboy + Rice",
+    price: 408,
+    calories: "600–650 kcal",
+    protein: 38,
+    carbs: 70,
+    fat: 18,
+    why: "Light sour soup with vegetables",
+    ingredients: "Pork, sinigang mix, kangkong, okra, rice",
+    recipe: "Boil pork with vegetables and sinigang mix.",
+    goal: "lose",
+    image: "PNGS/11.jpg"
+},
+{
+    name: "Paksiw na Galunggong + Rice",
+    price: 461,
+    calories: "600–650 kcal",
+    protein: 35,
+    carbs: 75,
+    fat: 15,
+    why: "Low-oil fish dish, budget-friendly",
+    ingredients: "Galunggong, vinegar, garlic, ginger, rice",
+    recipe: "Simmer fish in vinegar with garlic and ginger.",
+    goal: "lose",
+    image: "PNGS/15.jpg"
+},
+
+// ⚖️ MAINTAIN (ORIGINAL)
+{
+    name: "Chicken Afritada + Rice",
+    price: 404,
+    calories: "650–700 kcal",
+    protein: 48,
+    carbs: 72,
+    fat: 20,
+    why: "Balanced stew with vegetables",
+    ingredients: "Chicken, tomato sauce, potato, carrots, rice",
+    recipe: "Simmer chicken in tomato sauce with vegetables.",
+    goal: "maintain",
+    image: "PNGS/3.jpg"
+},
+{
+    name: "Adobong Sitaw + Sarciadong Galunggong + Rice",
+    price: 450,
+    calories: "650–700 kcal",
+    protein: 35,
+    carbs: 75,
+    fat: 20,
+    why: "Vegetables with fish protein",
+    ingredients: "Sitaw, galunggong, eggs, tomato, onion, rice",
+    recipe: "Cook sitaw adobo-style. Fry galunggong then simmer with egg and tomato.",
+    goal: "maintain",
+    image: "PNGS/6.jpg"
+},
+{
+    name: "Tinolang Manok + Tortang Dilis + Rice",
+    price: 460,
+    calories: "650–700 kcal",
+    protein: 48,
+    carbs: 65,
+    fat: 18,
+    why: "Protein-heavy Filipino comfort meal",
+    ingredients: "Chicken, papaya, dilis, eggs, rice",
+    recipe: "Cook tinola soup. Fry dilis omelette. Serve with rice.",
+    goal: "maintain",
+    image: "PNGS/7.jpg"
+},
+{
+    name: "Bangus Steak + Rice",
+    price: 491,
+    calories: "650–700 kcal",
+    protein: 45,
+    carbs: 65,
+    fat: 24,
+    why: "Heart-friendly fish meal",
+    ingredients: "Bangus, soy sauce, calamansi, onion, rice",
+    recipe: "Pan-fry bangus and simmer in soy-calamansi sauce.",
+    goal: "maintain",
+    image: "PNGS/4.jpg"
+},
+
+// 🔺 GAIN (ORIGINAL)
+{
+    name: "Scrambled Egg + Hotdog + Tuyo + Rice",
+    price: 494,
+    calories: "750–800 kcal",
+    protein: 42,
+    carbs: 70,
+    fat: 35,
+    why: "High energy breakfast",
+    ingredients: "Eggs, hotdog, tuyo, rice",
+    recipe: "Cook all separately, serve together.",
+    goal: "gain",
+    image: "PNGS/9.jpg"
+},
+{
+    name: "Chicken Adobo + Rice",
+    price: 479,
+    calories: "650–700 kcal",
+    protein: 50,
+    carbs: 65,
+    fat: 25,
+    why: "Protein-rich classic",
+    ingredients: "Chicken, soy sauce, vinegar, garlic, rice",
+    recipe: "Simmer chicken in soy and vinegar until tender.",
+    goal: "gain",
+    image: "PNGS/10.jpg"
+},
+{
+    name: "Pork Steak + Rice",
+    price: 499,
+    calories: "700–750 kcal",
+    protein: 52,
+    carbs: 68,
+    fat: 28,
+    why: "High protein, calorie-dense meal",
+    ingredients: "Pork, soy sauce, calamansi, onion, rice",
+    recipe: "Marinate pork in soy and calamansi, pan-fry until tender.",
+    goal: "gain",
+    image: "PNGS/14.jpg"
+},
+{
+    name: "Baked Tuna + Rice",
+    price: 496,
+    calories: "600–650 kcal",
+    protein: 38,
+    carbs: 68,
+    fat: 20,
+    why: "High protein, omega-3 fats",
+    ingredients: "Canned tuna, mayo, cheese, ketchup, rice",
+    recipe: "Mix tuna with mayo and cheese, bake until golden. Serve with rice.",
+    goal: "gain",
+    image: "PNGS/2.jpg"
+}
+
+];
+
+
+        // Helper function to determine price tier
+        function getPriceTier(price) {
+            if (price <= 200) return { label: "₱", class: "low" };
+            if (price <= 400) return { label: "₱₱", class: "mid" };
+            return { label: "₱₱₱", class: "high" };
+        }
+
+        // Gender selection
+        let selectedGender = 'male';
+        const genderButtons = document.querySelectorAll('.gender-btn');
+        
+        genderButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                genderButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedGender = btn.dataset.gender;
+            });
+        });
+
+        // Calculate button
+        document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+        function calculate() {
+            // Get values
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const age = parseInt(document.getElementById('age').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
+            const budget = document.getElementById('budget').value;
+            // If budget is empty, use null (no filter). If entered, enforce minimum of 150.
+            let budgetVal = null;
+            if (budget !== '' && budget !== null && budget !== undefined) {
+                budgetVal = Math.max(150, parseFloat(budget) || 150);
+                // Update the input to reflect enforced minimum
+                if (parseFloat(budget) < 150) {
+                    document.getElementById('budget').value = 150;
+                }
+            }
+
+            // Validate
+            if (!weight || !height || !age || !activity || !goal) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            if (weight < 20 || height < 100 || age < 10) {
+                alert('Please enter valid values.');
+                return;
+            }
+
+            // Calculate BMI
+            const heightM = height / 100;
+            const bmi = weight / (heightM * heightM);
+
+            // Calculate BMR (Mifflin-St Jeor)
+            let bmr;
+            if (selectedGender === 'male') {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+            } else {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            }
+
+            // Calculate TDEE
+            const tdee = bmr * activity;
+
+            // Adjust for goal
+            let targetCalories;
+            if (goal === 'lose') {
+                targetCalories = tdee - 500;
+            } else if (goal === 'gain') {
+                targetCalories = tdee + 300;
+            } else {
+                targetCalories = tdee;
+            }
+
+            // Ideal weight range
+            const minIdealWeight = (18.5 * heightM * heightM).toFixed(1);
+            const maxIdealWeight = (24.9 * heightM * heightM).toFixed(1);
+
+            // Body fat estimation
+            let bodyFat;
+            if (selectedGender === 'male') {
+                bodyFat = (1.20 * bmi) + (0.23 * age) - 16.2;
+            } else {
+                bodyFat = (1.20 * bmi) + (0.23 * age) - 5.4;
+            }
+            bodyFat = Math.max(3, Math.min(50, bodyFat));
+
+            // Macros
+            let proteinRatio, carbRatio, fatRatio;
+            if (goal === 'lose') {
+                proteinRatio = 0.35;
+                fatRatio = 0.25;
+                carbRatio = 0.40;
+            } else if (goal === 'gain') {
+                proteinRatio = 0.30;
+                fatRatio = 0.25;
+                carbRatio = 0.45;
+            } else {
+                proteinRatio = 0.30;
+                fatRatio = 0.30;
+                carbRatio = 0.40;
+            }
+
+            const protein = Math.round((targetCalories * proteinRatio) / 4);
+            const carbs = Math.round((targetCalories * carbRatio) / 4);
+            const fats = Math.round((targetCalories * fatRatio) / 9);
+
+            // Water intake
+            const water = (weight * 0.033).toFixed(1);
+
+            // BMI Category
+            let category, recommendations, showAlert;
+            
+            if (bmi < 16) {
+                category = 'SEVERELY UNDERWEIGHT';
+                showAlert = true;
+                recommendations = [
+                    'Consult a healthcare provider immediately',
+                    'Increase calorie intake with nutrient-dense foods',
+                    'Focus on strength training exercises',
+                    'Consider nutritional supplements'
+                ];
+            } else if (bmi < 18.5) {
+                category = 'UNDERWEIGHT';
+                recommendations = [
+                    'Increase calorie intake gradually',
+                    'Eat frequent, nutrient-rich meals',
+                    'Add healthy fats and proteins to diet',
+                    'Consider consulting a nutritionist'
+                ];
+            } else if (bmi < 25) {
+                category = 'NORMAL WEIGHT';
+                recommendations = [
+                    'Maintain current healthy habits',
+                    'Stay active with regular exercise',
+                    'Continue balanced, nutritious meals',
+                    'Get adequate sleep and hydration'
+                ];
+            } else if (bmi < 30) {
+                category = 'OVERWEIGHT';
+                recommendations = [
+                    'Create a moderate calorie deficit',
+                    'Increase physical activity gradually',
+                    'Focus on whole foods and vegetables',
+                    'Monitor portion sizes carefully'
+                ];
+            } else if (bmi < 35) {
+                category = 'OBESE CLASS I';
+                showAlert = true;
+                recommendations = [
+                    'Consult a healthcare provider',
+                    'Create a structured weight loss plan',
+                    'Start with low-impact exercises',
+                    'Work with a nutrition professional'
+                ];
+            } else if (bmi < 40) {
+                category = 'OBESE CLASS II';
+                showAlert = true;
+                recommendations = [
+                    'Seek medical guidance immediately',
+                    'Follow a supervised weight loss program',
+                    'Regular health monitoring essential',
+                    'Consider medical weight loss options'
+                ];
+            } else {
+                category = 'OBESE CLASS III';
+                showAlert = true;
+                recommendations = [
+                    'Urgent medical consultation required',
+                    'Comprehensive health evaluation needed',
+                    'Medical intervention may be necessary',
+                    'Follow supervised treatment program'
+                ];
+            }
+
+            // BMI position for indicator (15 to 40 range)
+            const bmiPosition = Math.min(100, Math.max(0, ((bmi - 15) / 25) * 100));
+
+            // Display results
+            displayResults({
+                bmi: bmi.toFixed(1),
+                category,
+                bmiPosition,
+                bmr: Math.round(bmr),
+                tdee: Math.round(tdee),
+                targetCalories: Math.round(targetCalories),
+                minIdealWeight,
+                maxIdealWeight,
+                bodyFat: bodyFat.toFixed(1),
+                protein,
+                carbs,
+                fats,
+                water,
+                recommendations,
+                showAlert,
+                goal,
+                budget: budgetVal
+            });
+        }
+
+        function pickRandomMeal(goal, budget = null) {
+            let matches = MEALS.filter(m => m.goal === goal);
+            
+            if (budget !== null) {
+                matches = matches.filter(m => m.price <= budget);
+            }
+            
+            if (matches.length === 0) return null;
+            return matches[Math.floor(Math.random() * matches.length)];
+        }
+
+        function generateWeeklyPlan(goal, budget) {
+            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            const plan = [];
+            let totalCost = 0;
+
+            days.forEach(day => {
+                const breakfast = pickRandomMeal(goal, budget);
+                const lunch = pickRandomMeal(goal, budget);
+                const dinner = pickRandomMeal(goal, budget);
+                
+                const dayCost = (breakfast?.price || 0) + (lunch?.price || 0) + (dinner?.price || 0);
+                totalCost += dayCost;
+
+                plan.push({
+                    day,
+                    breakfast,
+                    lunch,
+                    dinner,
+                    total: dayCost
+                });
+            });
+
+            return { plan, totalCost };
+        }
+
+        function sendToGmail() {
+            const email = document.getElementById('emailInput').value;
+            if (!email) {
+                alert('Please enter an email address!');
+                return;
+            }
+
+            // Get the weekly plan data from window object (stored during display)
+            if (!window.weeklyPlanText) {
+                alert('Please generate a meal plan first!');
+                return;
+            }
+
+            // Use mailto: protocol to open default email client
+            const subject = 'My Weekly Meal Plan - MealMate';
+            const body = window.weeklyPlanText;
+            
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        function displayResults(data) {
+            const initialMessage = document.getElementById('initialMessage');
+            const resultsDiv = document.getElementById('results');
+
+            initialMessage.style.display = 'none';
+
+            const goalText = data.goal === 'lose' ? 'Weight Loss' : 
+                           data.goal === 'gain' ? 'Muscle Gain' : 'Weight Maintenance';
+
+            let html = `
+                <div class="bmi-display">
+                    <div class="bmi-category">${data.category}</div>
+                    <div class="bmi-value">${data.bmi}</div>
+                    <div class="bmi-label">Body Mass Index</div>
+                    
+                    <div class="bmi-bar-container">
+                        <div class="bmi-bar">
+                            <div class="bmi-indicator" style="left: ${data.bmiPosition}%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <label>BMR</label>
+                        <value>${data.bmr} <span class="unit">kcal/day</span></value>
+                    </div>
+                    <div class="metric-card">
+                        <label>TDEE</label>
+                        <value>${data.tdee} <span class="unit">kcal/day</span></value>
+                    </div>
+                    <div class="metric-card">
+                        <label>Target (${goalText})</label>
+                        <value>${data.targetCalories} <span class="unit">kcal/day</span></value>
+                    </div>
+                    <div class="metric-card">
+                        <label>Body Fat</label>
+                        <value>${data.bodyFat} <span class="unit">%</span></value>
+                    </div>
+                    <div class="metric-card">
+                        <label>Ideal Weight</label>
+                        <value>${data.minIdealWeight}-${data.maxIdealWeight} <span class="unit">kg</span></value>
+                    </div>
+                    <div class="metric-card">
+                        <label>Water Intake</label>
+                        <value>${data.water} <span class="unit">liters/day</span></value>
+                    </div>
+                </div>
+
+                <div class="macros-section">
+                    <h2>🍽️ DAILY MACROS</h2>
+                    <div class="macros-grid">
+                        <div class="macro-card">
+                            <div class="macro-name">PROTEIN</div>
+                            <div class="macro-value">${data.protein}</div>
+                            <div class="macro-unit">grams/day</div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-name">CARBS</div>
+                            <div class="macro-value">${data.carbs}</div>
+                            <div class="macro-unit">grams/day</div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-name">FATS</div>
+                            <div class="macro-value">${data.fats}</div>
+                            <div class="macro-unit">grams/day</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (data.showAlert) {
+                html += `
+                    <div class="health-alert health-alert-soft">
+                        <h3>💬 Health Note</h3>
+                        <p>Your BMI is outside the typical healthy range. It may be worth chatting with a healthcare professional for guidance — you've got this! 💪</p>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="recommendations-box">
+                    <h3>💡 RECOMMENDATIONS</h3>
+                    <ul>
+                        ${data.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            // Add meal recommendations section
+            const recommendedMeals = MEALS.filter(meal => meal.goal === data.goal);
+            
+            // Filter by budget if provided
+            const budgetFilteredMeals = data.budget ? 
+                recommendedMeals.filter(meal => meal.price <= data.budget) : 
+                recommendedMeals;
+            
+            html += `
+                <div class="meals-section">
+                    <h2>🍴 RECOMMENDED MEALS FOR YOU</h2>
+                    <p>Based on your goal: <strong style="color: #b51f1f;">${goalText}</strong></p>
+            `;
+
+            if (data.budget) {
+                html += `<div class="budget-info">💰 Budget: ₱${data.budget} per meal</div>`;
+            } else {
+                html += `<div class="budget-info" style="background: rgba(100,200,100,0.15); border-color: #4caf50; color: #2e7d32;">🍽️ Showing all meals for your goal (no budget limit)</div>`;
+            }
+
+            if (budgetFilteredMeals.length === 0) {
+                html += `
+                    <p style="color: #b51f1f; font-size: 16px; text-align: center; padding: 30px; background: #f8d7da; border-radius: 14px;">
+                        ⚠️ No meals found within your ₱${data.budget} budget. Try increasing your budget or removing the budget filter.
+                    </p>
+                `;
+            } else {
+                html += `<div class="meal-grid">`;
+
+                budgetFilteredMeals.forEach(meal => {
+                    const tier = getPriceTier(meal.price);
+                    // Fallback to a colored placeholder if image doesn't load
+                    const fallbackImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f4ad28" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" font-size="24" fill="white" text-anchor="middle" dy=".3em" font-family="Arial Black"%3E' + encodeURIComponent(meal.name.substring(0, 20) + '...') + '%3C/text%3E%3C/svg%3E';
+                    
+                    html += `
+                        <div class="meal-card" onclick="this.classList.toggle('active')">
+                            <img src="${meal.image}" alt="${meal.name}" 
+                                 onerror="this.src='${fallbackImage}'">
+                            <div class="meal-content">
+                                <span class="price-tag ${tier.class}">${tier.label} ₱${meal.price}</span>
+                                <h3>${meal.name}</h3>
+                                <div class="meal-stats">
+                                    <strong>Calories:</strong> ${meal.calories}<br>
+                                    <strong>Protein:</strong> ${meal.protein}g<br>
+                                    <strong>Carbs:</strong> ${meal.carbs}g<br>
+                                    <strong>Fat:</strong> ${meal.fat}g
+                                </div>
+                                <div class="details">
+                                    <p><strong>Why healthy:</strong> ${meal.why}</p>
+                                    <p><strong>Ingredients:</strong> ${meal.ingredients}</p>
+                                    <p><strong>Recipe:</strong> ${meal.recipe}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+
+            // Generate Weekly Meal Plan
+            const { plan, totalCost } = generateWeeklyPlan(data.goal, data.budget);
+            
+            html += `
+                <div class="weekly-planner-section">
+                    <h2>📅 WEEKLY MEAL PLAN</h2>
+                    <p style="color: #666; margin-bottom: 20px;">
+                        Automatically generated meal plan based on your goal
+                        ${data.budget ? ` and ₱${data.budget} budget per meal` : ' (all meal options)'}
+                    </p>
+                    
+                    <table class="weekly-table">
+                        <tr>
+                            <th>Day</th>
+                            <th>Breakfast</th>
+                            <th>Lunch</th>
+                            <th>Dinner</th>
+                            <th>Daily Total</th>
+                        </tr>
+            `;
+
+            // Build email text version
+            let emailText = `MEALMATE WEEKLY MEAL PLAN\n`;
+            emailText += `================================\n\n`;
+            emailText += `YOUR HEALTH PROFILE:\n`;
+            emailText += `- BMI: ${data.bmi} (${data.category})\n`;
+            emailText += `- Goal: ${goalText}\n`;
+            emailText += `- Daily Calories: ${data.targetCalories} kcal\n`;
+            emailText += `- Macros: ${data.protein}g protein, ${data.carbs}g carbs, ${data.fats}g fat\n`;
+            if (data.budget) {
+                emailText += `- Budget per meal: ₱${data.budget}\n`;
+            }
+            emailText += `\n================================\n\n`;
+
+            plan.forEach(dayPlan => {
+                const bClass = dayPlan.breakfast ? getPriceTier(dayPlan.breakfast.price).class : '';
+                const lClass = dayPlan.lunch ? getPriceTier(dayPlan.lunch.price).class : '';
+                const dClass = dayPlan.dinner ? getPriceTier(dayPlan.dinner.price).class : '';
+
+                html += `
+                    <tr>
+                        <td><strong>${dayPlan.day}</strong></td>
+                        <td class="weekly-${bClass}">
+                            ${dayPlan.breakfast ? `${dayPlan.breakfast.name} <br><strong>(₱${dayPlan.breakfast.price})</strong>` : '—'}
+                        </td>
+                        <td class="weekly-${lClass}">
+                            ${dayPlan.lunch ? `${dayPlan.lunch.name} <br><strong>(₱${dayPlan.lunch.price})</strong>` : '—'}
+                        </td>
+                        <td class="weekly-${dClass}">
+                            ${dayPlan.dinner ? `${dayPlan.dinner.name} <br><strong>(₱${dayPlan.dinner.price})</strong>` : '—'}
+                        </td>
+                        <td style="text-align: center;"><strong>₱${dayPlan.total}</strong></td>
+                    </tr>
+                `;
+
+                // Add to email text
+                emailText += `${dayPlan.day.toUpperCase()}:\n`;
+                emailText += `  Breakfast: ${dayPlan.breakfast ? dayPlan.breakfast.name + ' (₱' + dayPlan.breakfast.price + ')' : 'N/A'}\n`;
+                emailText += `  Lunch: ${dayPlan.lunch ? dayPlan.lunch.name + ' (₱' + dayPlan.lunch.price + ')' : 'N/A'}\n`;
+                emailText += `  Dinner: ${dayPlan.dinner ? dayPlan.dinner.name + ' (₱' + dayPlan.dinner.price + ')' : 'N/A'}\n`;
+                emailText += `  Daily Total: ₱${dayPlan.total}\n\n`;
+            });
+
+            html += `
+                        <tr>
+                            <td colspan="4" style="text-align: right;"><strong>WEEKLY TOTAL:</strong></td>
+                            <td style="text-align: center;"><strong>₱${totalCost}</strong></td>
+                        </tr>
+                    </table>
+
+                    <div class="email-section">
+                        <input type="email" id="emailInput" placeholder="Enter Gmail address" readonly>
+                        <button onclick="sendToGmail()">SEND TO GMAIL</button>
+                    </div>
+                </div>
+            `;
+
+            emailText += `\n================================\n`;
+            emailText += `Weekly Total: ₱${totalCost}\n`;
+            emailText += `Average per day: ₱${(totalCost / 7).toFixed(2)}\n\n`;
+            emailText += `Generated by MealMate - Your Health & Nutrition Planner\n`;
+
+            // Store email text in window object for the send function
+            window.weeklyPlanText = emailText;
+
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.add('show');
+
+            // Auto-fill email from localStorage
+            autoFillUserEmail();
+
+            // Smooth scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Function to auto-fill user email from localStorage
+        function autoFillUserEmail() {
+            try {
+                const userData = localStorage.getItem('mealmate_current_user');
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    const emailInput = document.getElementById('emailInput');
+                    if (emailInput && user.email) {
+                        emailInput.value = user.email;
+                    }
+                }
+            } catch (error) {
+                console.log('Could not auto-fill email:', error);
+            }
+        }
+
+
+
+// Navbar scroll behavior - show nav links after scrolling
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('mainNav');
+    if (window.scrollY > 100) {
+        nav.classList.add('scrolled');
+    } else {
+        nav.classList.remove('scrolled');
+    }
+});
+
+// Search toggle functionality (only if search button exists)
+const searchBtn = document.getElementById('searchBtn');
+if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+        document.getElementById('mainNav').classList.toggle('search-open');
+    });
+}
+
+
+
+// ==================== USER PROFILE MANAGEMENT ====================
+    function loadUserProfile() {
+        var raw = localStorage.getItem('mealmate_current_user');
+        if (!raw) return; // head guard already handled the redirect case
+
+        try {
+            var user = JSON.parse(raw);
+            if (!user) return;
+
+            var initials = user.fullName
+                ? user.fullName.split(' ').map(function(n){return n[0];}).join('').toUpperCase().substring(0,2)
+                : (user.username||'G').substring(0,2).toUpperCase();
+
+            document.getElementById('userAvatar').textContent = initials;
+            document.getElementById('userName').textContent   = user.fullName || user.username || 'User';
+            document.getElementById('userEmail').textContent  = user.email || (user.username + '@mealmate.local');
+
+            if (document.getElementById('welcomeUser')) {
+                document.getElementById('welcomeUser').textContent =
+                    user.fullName ? user.fullName.split(' ')[0] : (user.username || 'Friend');
+            }
+
+        } catch(e) {
+            console.warn('Could not load user profile:', e);
+        }
+    }
+
+    function toggleProfileDropdown() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const profile = document.getElementById('userProfile');
+        const dropdown = document.getElementById('profileDropdown');
+        
+        if (!profile.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
+        }
+    });
+
+    function viewProfile() {
+        const raw = localStorage.getItem('mealmate_current_user');
+        if (!raw) { alert('Not logged in. Please sign in first.'); return; }
+        try {
+            const userData = JSON.parse(raw);
+            const joined = userData.createdAt || userData.loginAt;
+            alert(`Profile Information:\n\nName: ${userData.fullName || userData.username}\nEmail: ${userData.email || 'N/A'}\nUsername: ${userData.username || 'N/A'}\nJoined: ${joined ? new Date(joined).toLocaleDateString() : 'N/A'}`);
+        } catch(e) { alert('Could not load profile.'); }
+        toggleProfileDropdown();
+    }
+
+    function editProfile() {
+        alert('Profile editing feature coming soon!');
+        toggleProfileDropdown();
+    }
+
+    function viewSettings() {
+        alert('Settings page coming soon!');
+        toggleProfileDropdown();
+    }
+
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('mealmate_current_user');
+            // Redirect to auth page (index.html is 2 levels up from MEALMEET/MEALMATE/)
+            showAuth();
+        }
+    }
+
+    // Load user profile on page load
+    loadUserProfile();
+
+
+
+
+     // ==================== ANIMATED BACKGROUND ====================
+        const healthyFoods = ['🥗', '🥦', '🍎', '🥕', '🥑', '🌽', '🫐', '🥬', '🍊', '🥝', '🥒', '🧅', '🫒', '🥐', '🍞'];
+
+        function initializeBackground() {
+            const background = document.getElementById('foodBackground');
+            
+            for (let i = 0; i < 10; i++) {
+                const foodItem = document.createElement('div');
+                foodItem.className = 'food-item';
+                foodItem.textContent = healthyFoods[i % healthyFoods.length];
+                background.appendChild(foodItem);
+            }
+
+            setInterval(() => {
+                const foodItems = document.querySelectorAll('.food-item');
+                foodItems.forEach((item) => {
+                    const newFood = healthyFoods[Math.floor(Math.random() * healthyFoods.length)];
+                    item.textContent = newFood;
+                });
+            }, 4000);
+        }
+
+
+
+// ==================== EXPOSE GLOBALS ====================
+// These need to be accessible from onclick= in HTML
+window.toggleProfileDropdown = toggleProfileDropdown;
+window.toggleDarkMode = toggleDarkMode; // make 100% sure it's global
+window.toggleParticles = toggleParticles;
+window.viewProfile = viewProfile;
+window.editProfile = editProfile;
+window.viewSettings = viewSettings;
+window.logout = logout;
+window.sendToGmail = sendToGmail;
+
+// Call background init if element exists
+if (document.getElementById('foodBackground')) {
+    initializeBackground();
+}
+
+
+// ============================================================
+// 🚀 APP INIT
+// initApp() runs ONCE when the user first enters the app.
+// It sets up: particles, ticker banner, gallery grid, scroll reveals.
+// The _appInited flag makes sure it never runs twice.
+// ============================================================ (particles, ticker, gallery — runs once on first showApp)
+// ============================================================
+var _appInited = false;
+function initApp() {
+  if(_appInited) return;
+  _appInited = true;
+  // DARK MODE — persist across all pages
+
+// PARTICLES handled by initParticles() below
+
+// MARQUEE TICKER
+const tickerItems = [
+    { icon: '🍽️', text: 'FOOD' },
+    { icon: '💰', text: 'BUDGETING' },
+    { icon: '💪', text: 'GOALS' },
+    { icon: '🍛', text: 'FILIPINO MEALS' },
+    { icon: '🧮', text: 'SMART MACROS' },
+    { icon: '📅', text: 'WEEKLY PLANS' },
+    { icon: '✨', text: 'MORE EASIER!' },
+];
+function buildTicker() {
+    const track = document.getElementById('tickerTrack');
+    // Duplicate twice for seamless loop
+    [0,1].forEach(() => {
+        tickerItems.forEach((item, i) => {
+            const el = document.createElement('span');
+            el.className = 'ticker-item';
+            el.innerHTML = `<span class="icon">${item.icon}</span>${item.text}`;
+            track.appendChild(el);
+            if (i < tickerItems.length - 1) {
+                const dot = document.createElement('span');
+                dot.className = 'ticker-dot';
+                track.appendChild(dot);
+            }
+        });
+        // separator between duplicates
+        const sep = document.createElement('span');
+        sep.className = 'ticker-item';
+        sep.innerHTML = `<span class="icon">✦</span>`;
+        track.appendChild(sep);
+    });
+}
+buildTicker();
+
+// GALLERY — names pulled directly from MEALS array, one entry per unique image
+const galMeals = [
+    {i:'1.jpg',  n:'Grilled Chicken Breast + Brown Rice + Steamed Veggies', e:'🍗'},
+    {i:'2.jpg',  n:'Tuna Omelette + Rice + Sautéed Kangkong',               e:'🐟'},
+    {i:'3.jpg',  n:'Chicken Afritada + Rice',                               e:'🍲'},
+    {i:'4.jpg',  n:'Grilled Bangus + Ensaladang Talong + Rice',             e:'🐟'},
+    {i:'5.jpg',  n:'Tofu & Vegetable Stir-Fry + Rice',                     e:'🥗'},
+    {i:'6.jpg',  n:'Ginisang Monggo + Tofu + Rice',                        e:'🫘'},
+    {i:'7.jpg',  n:'Chicken Tinola + Rice',                                 e:'🍲'},
+    {i:'8.jpg',  n:'Sardinas Guisado + Egg + Rice',                        e:'🐟'},
+    {i:'9.jpg',  n:'Scrambled Egg + Hotdog + Tuyo + Rice',                 e:'🍳'},
+    {i:'10.jpg', n:'Chicken Adobo + Rice',                                  e:'🍗'},
+    {i:'11.jpg', n:'Pork Sinigang + Garlic Fried Rice + Ensalada',         e:'🥘'},
+    {i:'12.jpg', n:'Bulalo',                                                e:'🦴'},
+    {i:'14.jpg', n:'Pork Steak + Rice',                                    e:'🥩'},
+    {i:'15.jpg', n:'Paksiw na Galunggong + Rice',                          e:'🐟'},
+    {i:'19.jpg', n:'Tortang Talong + Rice',                                e:'🥚'},
+    {i:'20.jpg', n:'Itlog na Maalat + Kamatis + Rice',                     e:'🍳'},
+    {i:'21.jpg', n:'Ginisang Repolyo + Egg + Rice',                       e:'🥬'},
+    {i:'23.jpg', n:'Ginisang Togue + Rice',                               e:'🌿'},
+    {i:'24.jpg', n:'Egg Fried Rice (Homestyle)',                           e:'🍳'},
+    {i:'25.jpg', n:'Hotdog Omelette + Rice',                              e:'🌭'},
+    {i:'26.jpg', n:'Tortang Sardinas + Rice',                             e:'🐟'},
+    {i:'27.jpg', n:'Pritong Tofu + Rice + Mayo',                          e:'🥢'},
+    {i:'28.jpg', n:'Fried Egg + Rice + Peanut Butter',                   e:'🍳'},
+    {i:'30.jpg', n:'Tinolang Isda + Rice',                                e:'🍲'},
+    {i:'36.jpg', n:'Pork Giniling (Lean) + Rice',                        e:'🥩'},
+    {i:'39.jpg', n:'Corned Beef + Rice',                                  e:'🥫'},
+    {i:'40.jpg', n:'Pritong Manok (Leg Quarter) + Rice',                 e:'🍗'},
+    {i:'41.jpg', n:'Chicken Fried Rice',                                  e:'🍚'},
+    {i:'42.jpg', n:'Pork Chop + Rice',                                    e:'🥩'},
+    {i:'43.jpg', n:'Chicken Breast Tinola + Rice',                        e:'🍲'},
+];
+const gg = document.getElementById('galGrid');
+galMeals.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'gal-item';
+    el.onclick = () => openModal(m.e, m.n, 'A delicious Filipino dish! Scroll up to the calculator to get this in your personalized meal plan.');
+    el.innerHTML = `<img src="PNGS/${m.i}" alt="${m.n}" loading="lazy" onerror="this.style.display='none'"><div class="gal-over"><div class="gal-label">${m.e} ${m.n}</div></div>`;
+    gg.appendChild(el);
+});
+
+function openModal(icon, title, desc) {
+    document.getElementById('mIcon').textContent = icon;
+    document.getElementById('mTitle').textContent = title;
+    document.getElementById('mDesc').textContent = desc;
+    document.getElementById('galModal').classList.add('on');
+}
+function closeModal() { document.getElementById('galModal').classList.remove('on'); }
+document.getElementById('galModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.querySelector('#galModal .m-close').addEventListener('click', function(e) { e.stopPropagation(); closeModal(); });
+
+// REVEAL
+const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Navbar scroll reveal
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('mainNav');
+    nav.classList.toggle('scrolled', window.scrollY > 100);
+});
+
+}
+
+// ============================================================
+// DARK MODE TOGGLE
+// This lives in GLOBAL scope so the navbar button can call it.
+// The button's onclick="toggleDarkMode()" needs this to be global.
+// ============================================================
+function toggleDarkMode() {
+  var html = document.documentElement;
+  // Are we currently dark? If yes, go light. If light, go dark.
+  var isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  // Update the button label text
+  var btn = document.getElementById('darkBtn');
+  if (btn) {
+    var label = btn.querySelector('.btn-label');
+    if (label) {
+      label.textContent = isDark ? 'Dark' : 'Light';
+    }
+  }
+  // Save the choice to localStorage so it persists on next visit
+  localStorage.setItem('mm-theme', isDark ? 'light' : 'dark');
+}
+
+// Apply saved dark/light theme immediately when page loads
+(function applyStoredTheme() {
+  var saved = localStorage.getItem('mm-theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    var btn = document.getElementById('darkBtn');
+    if (btn) {
+      var label = btn.querySelector('.btn-label');
+      if (label) label.textContent = 'Light';
+    }
+  }
+})();
+
+
+
+// ============================================================
+// DARK MODE (app side)
+// ============================================================
+// toggleDarkMode defined above
+
+
+
+
+function scrollToSection(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var navH = document.getElementById('mainNav') ? document.getElementById('mainNav').offsetHeight : 90;
+  var top = el.getBoundingClientRect().top + window.scrollY - navH - 12;
+  window.scrollTo({ top: top, behavior: 'smooth' });
+}
+
+// ============================================================
+// ✨ PARTICLE SYSTEM
+// Floating food emojis in the background.
+// - initParticles()        → creates 15 emoji divs and adds them to the page
+// - applyParticleVisibility() → shows/hides them depending on which section you're on
+//   Particles only show on: Auth page, BMI section, Gallery, Why Us section
+// - toggleParticles()      → the Effects button in the navbar turns them on/off
+// - Opacity is fixed at 30% so they're subtle, not distracting
+// ============================================================ — fixed 15 particles, 30% opacity
+// Visible only on: auth, bmi-section, gallery, features (.why)
+// User can toggle on/off via navbar button
+// ============================================================
+var _particlesOn = true;
+var _currentSection = 'auth';
+
+var PARTICLE_FOODS = ['🍛','🍜','🥘','🍚','🥗','🍗','🥩','🌶️','🧄','🥬','🍅','🍳','🥦','🧅','🫘'];
+var PARTICLE_SECTIONS = ['auth', 'bmi-section', 'gallery', 'features-section'];
+
+function initParticles() {
+  var pc = document.getElementById('bgParticles');
+  if (!pc) return;
+  pc.innerHTML = '';
+  for (var i = 0; i < 15; i++) {
+    var d = document.createElement('div');
+    d.className = 'particle';
+    d.textContent = PARTICLE_FOODS[i % PARTICLE_FOODS.length];
+    d.style.left = (5 + Math.random() * 90) + '%';
+    d.style.fontSize = (16 + Math.random() * 16) + 'px';
+    d.style.animationDuration = (16 + Math.random() * 16) + 's';
+    d.style.animationDelay = '-' + (Math.random() * 20) + 's'; // negative delay = already mid-flight
+    pc.appendChild(d);
+  }
+  // Set 30% opacity via keyframe override
+  var st = document.getElementById('particle-opacity-override');
+  if (!st) { st = document.createElement('style'); st.id = 'particle-opacity-override'; document.head.appendChild(st); }
+  st.textContent = '@keyframes floatUp{0%{transform:translateY(105vh) rotate(0deg);opacity:0}5%{opacity:0.30}90%{opacity:0.30}100%{transform:translateY(-10vh) rotate(360deg);opacity:0}}';
+}
+
+function toggleParticles() {
+  _particlesOn = !_particlesOn;
+  localStorage.setItem('mm_particles_on', _particlesOn ? '1' : '0');
+  applyParticleVisibility();
+  // Update both toggle buttons
+  var appBtn = document.getElementById('particleBtn');
+  if (appBtn) { var sp=appBtn.querySelector('.btn-label'); if(sp){sp.textContent=_particlesOn?'Effects':'Off';}else{appBtn.textContent=_particlesOn?'✨ Effects':'○ Effects';} }
+}
+
+function getCurrentSection() {
+  // Auth page
+  if (document.body.classList.contains('auth-mode')) return 'auth';
+  // Scroll-based detection for app sections
+  var checks = [
+    { id: 'bmi-section',      key: 'bmi-section' },
+    { id: 'gallery',          key: 'gallery' },
+  ];
+  // Features / "Why MealMate" section
+  var featEl = document.querySelector('.features-section');
+  if (featEl) {
+    var fr = featEl.getBoundingClientRect();
+    if (fr.top < window.innerHeight * 0.6 && fr.bottom > 0) return 'features-section';
+  }
+  for (var i = 0; i < checks.length; i++) {
+    var el = document.getElementById(checks[i].id);
+    if (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight * 0.6 && r.bottom > 0) return checks[i].key;
+    }
+  }
+  return 'hero'; // hero / stats / cta sections
+}
+
+function applyParticleVisibility() {
+  var pc = document.getElementById('bgParticles');
+  if (!pc) return;
+  var section = getCurrentSection();
+  var sectionAllowed = PARTICLE_SECTIONS.indexOf(section) !== -1;
+  pc.style.display = (_particlesOn && sectionAllowed) ? 'block' : 'none';
+}
+
+// Run on scroll
+window.addEventListener('scroll', applyParticleVisibility, { passive: true });
+
+// Init on load
+(function() {
+  var saved = localStorage.getItem('mm_particles_on');
+  if (saved === '0') _particlesOn = false;
+  initParticles();
+  applyParticleVisibility();
+  var appBtn = document.getElementById('particleBtn');
+  if (appBtn) { var sp=appBtn.querySelector('.btn-label'); if(sp){sp.textContent=_particlesOn?'Effects':'Off';}else{appBtn.textContent=_particlesOn?'✨ Effects':'○ Effects';} }
+})();
+
+// ============================================================
+// ▶️ STARTUP
+// This runs automatically when the page loads.
+// It checks localStorage: "Is there a logged-in user saved?"
+//   YES → skip the login page, go straight to the app
+//   NO  → show the login page
+// ============================================================
+// ============================================================
+(function() {
+  try {
+    var raw = localStorage.getItem('mealmate_current_user');
+    if(raw && raw !== 'undefined' && raw !== 'null') {
+      var u = JSON.parse(raw);
+      if(u && (u.username || u.fullName)) {
+        showApp();
+        return;
+      }
+    }
+  } catch(e) {
+    localStorage.removeItem('mealmate_current_user');
+  }
+  showAuth();
+  if(localStorage.getItem('mm-theme')==='dark') {
+    var ab = document.getElementById('authDarkBtn');
+    if(ab) ab.textContent = '☀️ Light';
+  }
+})();
+</script>
+</body>
+</html>
